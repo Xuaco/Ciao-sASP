@@ -1,6 +1,5 @@
 :- module(ciao_auxiliar, [
 	absolute_file_name/3,
-	take_dir/3,
 	get_single_char/1,
 	
 	writef/1,

@@ -14,7 +14,7 @@ under Grant No. 1423419 visit
 https://sourceforge.net/projects/sasp-system/ for the s(ASP) source
 code.
 
-Instalation of c(ASP)
+Installation of c(ASP) - Only tested in Mac-OS
 ---------------------
 
 To run c(ASP) you need CIAO Prolog working in your computer:
@@ -92,4 +92,36 @@ iterative mode and refresh the justification.html file in the browser:
    ?- ...
 
 
+
+Use of a browser local_interface
+--------------------------------
+
+c(ASP) provide a tool called 'web_casp' which run a html/php
+local_interface allowing the execution of c(ASP) programs with user
+queries and provide the results in a html file showing the HTML
+justification tree
+
+The installation is similar to casp:
+
+    $ ciaoc -x -o web_casp web_casp.pl
+
+And it execution is simpler:
+
+    $ ./web_casp
+
+It run php to create a localhost server and then open the index file
+located in the directory 'src/server/'.
+
+'Index.html' provides a form where we specify the location of a
+c(ASP) program (using reference path from 'src/server/') and a query
+(if the query field is empty the program execute the query specify in
+the c(ASP) program.
+
+As an example:
+   Program:   ../../test/hanoi.pl
+   Query:     ?- hanoi(4,Y).
+
+Pressing the button 'Submit' c(ASP) evaluate the program
+'../../test/hanoi.pl' and the query '?- hanoi(4,Y) and present the results
+in the next page ('html/justification') with its justification.
 

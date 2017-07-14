@@ -1006,9 +1006,22 @@ print_html(X,[Q,CHSo,Qv,Vo]) :-
 	br,br,nl,
 	once(print_chs(CHSo, Vo, 0)),nl,
 	br,br,nl,
-	print('<font color=blue>'),
-	once(print_vars(Qv,Vo)),
-	print(' ? </font>'),nl,
+	( Vo \= [] ->
+	  get_var_vals(Qv, Vo, X2),
+	  group_by_val(X2, X3),
+	  remove_nonprinting(X3, X4),
+	  (
+	      X4 \= [] ->
+	      print('<font color=blue>'),
+	      once(print_vars(Qv,Vo)),
+	      print(' ? </font>')
+	  ;
+	      true
+	  )
+	;
+	    true
+	),
+	nl,
 	br,br,nl,
 	print('<h3> Justification </h3>\n <ul class="tree">'),nl,
 	print_list(X,2),
@@ -1024,16 +1037,17 @@ print_query(Q) :-
 	    defined_query(Q, _) ->
 	    format_term_list(Q, Q2, _, V),
 	    print('<b><font color=blue>?-</font> '),
-	    print_query_(Q2),
+	    print_body(Q2),
 	    print('</b>')
 	;
 	    true
 	).
-print_query_([X]):-
+print_body([]) :- print('true.').
+print_body([X]):-
 	print(X),print('.').
-print_query_([X,Y|Xs]):-
-	print(X),print(', '),
-	print_query_([Y|Xs]).
+print_body([X,Y|Xs]):-
+	print(X),print(', &nbsp; &nbsp;'),
+	print_body([Y|Xs]).
 
 :- dynamic file/1.
 open_output_file(Stream,Temp) :-
@@ -1049,12 +1063,14 @@ close_output_file(Stream,Temp) :-
 br :- print('<br>').
 
 print_item([],_) :- !.
-print_item([-(expand__call(Call),C,J)],L) :- !,
-	print(' -> '), print(expand__call(Call)), print_var(C),
+print_item([-(expand__call(Head-Body),C,J)],L) :- !,
+	print_var(C),
+	print(' \t<font color=green size=-1> &emsp;  '), print(Head), print(' :- '),
+	print_body(Body), print('</font>'),
 	print_item(J,L).
-print_item([-(chs__success,G,C)],_L) :- !,
-	print(' -> '), print(chs__success),
-	print(' : '), print(G),
+print_item([-(chs__success,_G,C)],_L) :- !,
+	print(' <font color=green> &emsp; &#10003; </font> '), % print(chs__success),
+ %	print(' : '), print(G),
 	print(' '), print_var(C).
 print_item(-(A,B,C),L) :- !,
 	print(A), print_var(B),

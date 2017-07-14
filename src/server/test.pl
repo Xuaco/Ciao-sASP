@@ -21,7 +21,7 @@ q(X) :- not p(X).
 
 
 ?- q(X).
-?- p(X).
+
 
 %% PROGRAM 2:
 %% three models (normal prolog query)

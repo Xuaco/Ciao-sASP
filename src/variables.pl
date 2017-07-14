@@ -14,7 +14,7 @@
                         body_vars/3,
                         body_vars2/4,
                         get_unique_vars/6,
-                        generate_unique_var/3,
+                        generate_unique_var/4,
                         print_var_struct/1
                      ]).
 
@@ -64,6 +64,7 @@ Predicates related to storing, accessing and modifying variables.
 :- use_module(common).
 :- use_module(output). % for format_term/4.
 :- use_module(solve). % for unification.
+:- use_module(options).
 
 %! var_struct(?VarStruct:compound, ?Variables:list, ?Values:list, ?NameCnt:int, ?IDCnt:int) is det
 % Convert a var struct to its components or vice-versa. The purpose of the var
@@ -98,7 +99,6 @@ var_con(con(C, U, L), C, U, L).
 % upper-case letter.
 %
 % @param Test The item to be tested.
-%% is_var(_) :-display('|'),fail.
 is_var(X) :-
         atom(X),
         atom_chars(X, Xc),
@@ -663,8 +663,9 @@ get_unique_vars3(Gi, Go, Vs, Vs, V, V) :-
 get_unique_vars3(Gi, Go, Vsi, Vso, Vi, Vo) :-
         is_var(Gi), % not encountered, generate a value.
         !,
-        generate_unique_var(Go, Vsi, Vso),
+        generate_unique_var(Go, Vsi, Vso, Gi),
         Vo = [-(Gi, Go) | Vi],
+	display(gen(Gi,Go,Vi)),nl,
         !.
 get_unique_vars3(Gi, Go, Vsi, Vso, Vi, Vo) :-
         Gi =.. [F | A], % compound term, process args
@@ -676,17 +677,38 @@ get_unique_vars3(G, G, Vs, Vs, V, V) :-
         % not a variable or compound term; skip it.
         !.
 
-%! generate_unique_var(-Var:ground, +VarsIn:compound, -VarsOut:compound) is det
-% Using the counter in the variable struct, generate a unique variable name and
-% then update the counter by incrementing it.
+%! generate_unique_var(-Var:ground, +VarsIn:compound,
+% -VarsOut:compound, +Name:rule Name) is det Using the counter in the
+% variable struct, generate a unique variable name and then update the
+% counter by incrementing it.
 %
 % @param Var The newly generated variable.
 % @param VarsIn Input vars.
 % @param VarsOut Output vars.
-generate_unique_var(Var, Vi, Vo) :-
+generate_unique_var(Var, Vi, Vo, Name) :-
         var_struct(Vi, V1, V2, Ci, I), % get initial counter value.
         number_chars(Ci, Cc),
-        atom_chars(Var, ['V', 'a', 'r' | Cc]),
+	(
+	    user_option(html_justification, true) ->
+	    atom_chars(Name,[F | Cname]),
+	    (
+		F \= '_' ->
+		atom_chars('<sub>', Ini),
+		atom_chars('&nbsp;</sub>', Fin),
+		append(Ini, Cc, Tmp),
+		append(Tmp, Fin, NewCc),
+		append([F |Cname],  NewCc, Cvar),
+		atom_chars(Var, Cvar)
+	    ;
+		atom_chars('<sub>', Ini),
+		atom_chars('&nbsp;</sub>', Fin),
+		append(Ini, Cc, Tmp),
+		append(Tmp, Fin, NewCc),
+		atom_chars(Var, ['_', 'V' | NewCc])
+	    )
+	;
+	    atom_chars(Var, ['V', 'a', 'r' | Cc])
+	),
         Co is Ci + 1,
         var_struct(Vo, V1, V2, Co, I), % repack the struct
         !.

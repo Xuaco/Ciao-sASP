@@ -1,0 +1,38 @@
+<!doctype html>
+ <html>
+ <head>
+ <meta charset="utf-8">
+ <title>c(ASP) Justification</title>
+ <link href="css/jquery.treemenu.css" rel="stylesheet" type="text/css">
+ <link href="css/tree.css" rel="stylesheet" type="text/css">
+ 
+ <link rel="icon" href="logo.ico">
+ 
+ </head>
+ 
+ <body>
+ 
+<h3>Query</h3>
+<b><font color=blue>?-</font> not(_false).</b>
+<br><br>
+{ }
+<br><br>
+
+<br><br>
+<h3> Justification </h3>
+ <ul class="tree">
+  <li> not(_false) 	<font color=green size=-1> &emsp;  not(_false) :- true.</font></li>
+  <li> _nmr_check 	<font color=green size=-1> &emsp;  _nmr_check :- true.</font></li>
+</ul>
+
+ <script src="js/jquery-1.11.2.js"></script>
+ <script src="js/jquery.treemenu.js"></script>
+ 
+ <script>
+ $(function(){
+        $(".tree").treemenu({delay:100}).openActive();
+    });
+ </script>
+ 
+ </body>
+ </html>

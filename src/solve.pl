@@ -456,7 +456,7 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
 %        list contains info on the rules used to satisfy Goal.
 % @param InNMR 1 if the goal was first added after entering the NMR check, 0
 %        otherwise.
-expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(G2), C, Js), NMR) :- % match
+expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(Head-Body), C, Js), NMR) :- % match
         rule(X, H, B),
         once(get_unique_vars(H, H2, B, B2, Vi, V1)),
         if_debug(3, (
@@ -467,7 +467,14 @@ expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(G2), C, Js), 
                 writef(') with ~w\n', [H3])
                 )),
         solve_unify(G, H2, V1, V2, 0), % unify goal and head args
-        format_term(G, G2, C, V2), % fill in variables, strip prefixes, etc.
+        (
+	    user_option(html_justification, true) ->
+	    format_term(H2, Head, C, V1),
+	    format_term(B2, Body, C, V1),
+	    G2 = Head-Body
+	;
+	    format_term(G, G2, C, V2) % fill in variables, strip prefixes, etc.
+	),
         solve_goals(B2, V2, Vo, CHSi, CHSo, Cs, E, Js, NMR).
 expand_call2(G, [_ | T], Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :- % not a match or backtracking
         if_debug(2, (
@@ -493,7 +500,7 @@ gen_sub_vars([X | T], [-(X, Y) | T2], Vi, Vo) :-
         Lv =\= -1,
         !,
         var_con(Val, Con, F, 1), % Flag as loop variable.
-        generate_unique_var(Y, Vi, V2), % get new variable
+        generate_unique_var(Y, Vi, V2, '_'), % get new variable
         update_var_value(Y, Val, V2, V3), % copy value to new variable
         gen_sub_vars(T, T2, V3, Vo).
 gen_sub_vars([X | T], T2, Vi, Vo) :-

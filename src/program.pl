@@ -292,7 +292,7 @@ handle_classical_negations([], _) :-
 assert_program_struct(P) :-
         program(P, R, _, Q),
         assert_rules(R),
-        assert_query(Q),
+	assert_query(Q),
         !.
 
 %! assert_rules(+Rules:list) is det

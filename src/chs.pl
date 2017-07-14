@@ -727,7 +727,7 @@ replace_vars2(Gi, Go, Vsi, Vso, Vi, Vo, 0) :-
         Vl =\= 1,
         !,
         var_con(Val, Con, 0, Vl), % ALLOW further constraints or instantiation.
-        generate_unique_var(Go, Vsi, Vs1),
+        generate_unique_var(Go, Vsi, Vs1, Gi),
         update_var_value(Go, Val, Vs1, Vso), % copy value to new variable
         Vo = [-(Gi, Go) | Vi].
 replace_vars2(Gi, Go, Vsi, Vso, Vi, Vo, 1) :-
@@ -735,7 +735,7 @@ replace_vars2(Gi, Go, Vsi, Vso, Vi, Vo, 1) :-
         Vl =\= 1,
         !,
         var_con(Val, Con, 2, Vl), % DISALLOW further constraints or instantiation.
-        generate_unique_var(Go, Vsi, Vs1),
+        generate_unique_var(Go, Vsi, Vs1, Gi),
         update_var_value(Go, Val, Vs1, Vso), % copy value to new variable
         Vo = [-(Gi, Go) | Vi].
 replace_vars2(Gi, Val2, Vsi, Vso, Vi, Vo, Flag) :-
