@@ -41,6 +41,8 @@ Given the input program, build a call graph and assert the components.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+:-set_prolog_flag(multi_arity_warnings,off).
+	
 :- use_module(common).
 
 %! a(?Head:int, ?Goal:int, ?Negation:int, ?ID:int) is det

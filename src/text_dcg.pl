@@ -55,7 +55,8 @@ Input programs are normal logic programs with the following additions:
 */
 
 :- use_module(library(lists)).
-:- use_module(library(writef)).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(common).
 :- use_module(program).
 
@@ -378,7 +379,7 @@ asp_predicate(X) -->
         !,
         {handle_prefixes(Y, Y2)},
         {atom_chars(Y2, Y3)},
-        {name(Y4, ['c', '_' | Y3])}, % prefix for classical negation
+        {c_name(Y4, ['c', '_' | Y3])}, % prefix for classical negation
         asp_predicate2(X, Y4).
 asp_predicate(builtin_1(X)) -->
         [(builtin(Y), _)], % built-in, don't add prefixes
@@ -409,14 +410,14 @@ asp_predicate2(Z, X) -->
         {number_chars(C, C2)}, % get char codes for digits
         {atom_chars(X, X2)},
         {append(X2, ['_' | C2], X3)},
-        {name(X4, X3)},
+        {c_name(X4, X3)},
         {predicate(Z, X4, Y)}.
 asp_predicate2(X, Y) -->
         [],
         !,
         {atom_chars(Y, Y2)},
         {append(Y2, ['_', '0'], Y3)},
-        {name(Y4, Y3)},
+        {c_name(Y4, Y3)},
         {predicate(X, Y4, [])}.
 
 %! terms(-Terms:list, +TokensIn:list, -TokensOut:list)
@@ -743,7 +744,7 @@ syntax_error(Expected) -->
         !.
 syntax_error(Expected, [], []) :-
         syntax_msg(Expected, ExpMsg),
-        swritef(Msg, 'ERROR: Unexpected end of file. %w.\n', [ExpMsg]),
+        swritef(Msg, 'ERROR: Unexpected end of file. ~w.\n', [ExpMsg]),
         write(user_error, Msg),
         !.
 
@@ -757,12 +758,12 @@ syntax_error2(Token, (Source, Line, Col), Expected) :-
         syntax_msg(Expected, ExpMsg),
         visible_token(Token, Vtok),
         !,
-        swritef(Msg, 'ERROR: %w:%w:%w: Syntax error at \"%w\". %w.\n', [Source, Line, Col, Vtok, ExpMsg]),
+        swritef(Msg, 'ERROR: ~w:~w:~w: Syntax error at \"~w\". ~w.\n', [Source, Line, Col, Vtok, ExpMsg]),
         write(user_error, Msg).
 syntax_error2(Token, (Source, Line, Col), _) :-
         visible_token(Token, Vtok),
         !,
-        swritef(Msg, 'ERROR: %w:%w:%w: Syntax error at \"%w\".\n', [Source, Line, Col, Vtok]),
+        swritef(Msg, 'ERROR: ~w:~w:~w: Syntax error at \"~w\".\n', [Source, Line, Col, Vtok]),
         write(user_error, Msg).
 
 %! syntax_msg(+Type:atom, -Message:string)
@@ -799,12 +800,12 @@ syntax_msg(int(X), 'Expected integer') :-
         var(X).
 syntax_msg(int(X), Msg) :-
         integer(X),
-        swritef(Msg, 'Expected integer %w', [X]).
+        swritef(Msg, 'Expected integer ~w', [X]).
 syntax_msg(X, Msg) :-
         visible_token(X, Vtok),
-        swritef(Msg, 'Expected \"%w\"', [Vtok]).
+        swritef(Msg, 'Expected \"~w\"', [Vtok]).
 syntax_msg(X, Msg) :-
-        swritef(Msg, 'Expected \"%w\"', [X]).
+        swritef(Msg, 'Expected \"~w\"', [X]).
 
 %! visible_token(+Type:atom, -String:string)
 % For tokens replaced during scanning, get the proper character or string to
@@ -836,3 +837,8 @@ parse_recover -->
 parse_recover -->
         [(_, _)],
         parse_recover.
+
+
+
+
+

@@ -18,6 +18,7 @@
                         print_var_struct/1
                      ]).
 
+
 /** <module> Variable storage and access
 
 Predicates related to storing, accessing and modifying variables.
@@ -54,9 +55,12 @@ Predicates related to storing, accessing and modifying variables.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+:-set_prolog_flag(multi_arity_warnings,off).
+
 :- use_module(library(lists)).
-:- use_module(library(rbtrees)).
-:- use_module(library(writef)).
+:- use_module(rbtrees).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(common).
 :- use_module(output). % for format_term/4.
 :- use_module(solve). % for unification.
@@ -94,6 +98,7 @@ var_con(con(C, U, L), C, U, L).
 % upper-case letter.
 %
 % @param Test The item to be tested.
+%% is_var(_) :-display('|'),fail.
 is_var(X) :-
         atom(X),
         atom_chars(X, Xc),
@@ -279,7 +284,7 @@ add_var_constraint(V, C, Vsi, Vso) :-
         member(X, Cc2),
         %add_var_constraint2(C, Cs, Cs2),
         %var_con(Val2, Cs2, F, 1),
-        %writef('loop var %w! Added var con for %w to get %w!\n', [V, C, Cs2]),
+        %writef('loop var ~w! Added var con for ~w to get ~w!\n', [V, C, Cs2]),
         update_var_value(V, val(X), Vsi, Vso).
 
 %! add_var_constraint2(+Val:compound, +ConsIn:list, -ConsOut:list) is det
@@ -444,13 +449,13 @@ id_to_var(X, [_ | T], Vs, Iv) :-
 unify_vars(V1, V2, Vs, Vs, _) :-
         get_value_id(V1, I, Vs),
         get_value_id(V2, I, Vs), % Variables are already unified.
-        %writef('uv a: unifying %w, ID %w with %w, ID %w\n', [V1, I, V2, I2]),
+        %writef('uv a: unifying ~w, ID ~w with ~w, ID ~w\n', [V1, I, V2, I2]),
         !.
 unify_vars(V1, V2, Vsi, Vso, _) :-
         is_unbound(V1, Vsi, C1, F1, L1),
         is_unbound(V2, Vsi, C2, F2, L2), % both are unbound or constrained
         !,
-        %writef('uv b, vars = %w\n', [Vsi]),
+        %writef('uv b, vars = ~w\n', [Vsi]),
         merge_constraints(C1, C2, C3), % get the MGU (here, merged constraints)
         ((F1 =:= 1 ; F2 =:= 1) ->
                 F3 is 1
@@ -460,7 +465,8 @@ unify_vars(V1, V2, Vsi, Vso, _) :-
         ((L1 =:= -1 ; L2 =:= -1) -> % if either var is unloopable or a loop var, both must be
                 L3 is -1
         ;
-                L3 is max(L1, L2)
+	    max(L1, L2, M),
+                L3 is M
         ),
         var_con(Val, C3, F3, L3),
         update_var_value(V1, Val, Vsi, Vs1), % update the value to the MGU
@@ -694,5 +700,8 @@ print_var_struct(V) :-
         var_struct(V, Vid, Vval, _, _),
         rb_visit(Vid, Vid2),
         rb_visit(Vval, Vval2),
-        writef('\n\nRAW VARIABLE ID TABLE:\n%w\n\n', [Vid2]),
-        writef('RAW ID VALUE TABLE:\n%w', [Vval2]).
+        writef('\n\nRAW VARIABLE ID TABLE:\n~w\n\n', [Vid2]),
+        writef('RAW ID VALUE TABLE:\n~w', [Vval2]).
+
+
+

@@ -42,7 +42,8 @@ interactive mode.
 */
 
 :- use_module(library(lists)).
-:- use_module(library(writef)).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(io).
 :- use_module(text_dcg).
 :- use_module(tokenizer).
@@ -50,10 +51,11 @@ interactive mode.
 %! help
 % Print usage information.
 help :-
-        current_prolog_flag(argv, [Prog | _]),
-        swritef(M1, 'Usage: %w [options] InputFile(s)\n\n', [Prog]),
+	%        current_prolog_flag(argv, [Prog | _]),
+	Prog = casp,
+        swritef(M1, 'Usage: ~w [options] InputFile(s)\n\n', [Prog]),
         write(user_error, M1),
-        swritef(M2, 's(ASP) computes stable models of ungrounded normal logic programs.\n', []),
+        swritef(M2, 'c(ASP) computes stable models of ungrounded normal logic programs.\n', []),
         write(user_error, M2),
         % for reference on line length (keep under 80 chars/line incl. newline):
         %                 '1                                                                          80->x'
@@ -67,6 +69,7 @@ help :-
         write(user_error, '  -v, --verbose      Enable verbose progress messages.\n'),
         write(user_error, '  -vv, --veryverbose Enable very verbose progress messages.\n'),
         write(user_error, '  -j                 Print proof tree for each solution.\n'),
+        write(user_error, '  -w                 Generate html file with proof tree for each solution.\n'),
         write(user_error, '  -n                 Hide goals added to solution by global consistency checks.\n'),
         write(user_error, '  -la                Print a separate list of succeeding abducibles with each\n'),
         write(user_error, '                     CHS. List will only be printed if at least one abducible\n'),
@@ -96,11 +99,11 @@ get_user_query(Q) :-
 % A query has succeeded, so get input from the user to accept ('.') or reject
 % (';') it.
 get_user_response :-
+	write(' ? '),
         get_single_char(C),
-        char_code(C2, C),
-        writef('%w\n', [C2]),
+	nl,
         !,
-        get_user_response2(C2).
+        get_user_response2(C).
 
 %! get_user_response2(+Char:char) is det
 % Process the user's response. For invalid responses, print an error and give
@@ -108,7 +111,7 @@ get_user_response :-
 %
 % @param Char The one character response.
 get_user_response2(C) :- % accept
-        member(C, ['.', 'c', 'a']),
+        member(C, ['.', 'c', 'a', '\n']),
         !.
 get_user_response2(C) :- % accept
         char_type(C, end_of_line),
@@ -127,8 +130,12 @@ get_user_response2(C) :- % help
         !,
         get_user_response.
 get_user_response2(C) :-
-        writef('Unknown action: %w (h for help)\n', [C]),
+        writef('Unknown action: ~w (h for help)\n', [C]),
         write('Action? '),
         !,
         get_user_response.
+
+
+
+
 

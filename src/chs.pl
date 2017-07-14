@@ -43,7 +43,7 @@ Handle CHS-related operations.
 */
 
 :- use_module(library(lists)).
-:- use_module(library(rbtrees)).
+:- use_module(rbtrees).
 :- use_module(common).
 :- use_module(debug).
 :- use_module(output). % for fill_in_variable_values/5
@@ -107,26 +107,26 @@ check_chs(F, A, Vi, Vo, C, Cs, Flag, Eloop) :- % constructive coinductive failur
                 true
         ),
         once(get_dual_entries(E, Ens, C, Vi)),
-        %writef('check_chs Ens = %w\n', [Ens]),
+        %writef('check_chs Ens = ~w\n', [Ens]),
         Ens \= [],
         G =.. [F | A],
         once(fill_in_variable_values(G, G2, [], _, Vi)),
-        %writef('chs matching against negation of %w: %w\n', [G2, Ens]),
+        %writef('chs matching against negation of ~w: ~w\n', [G2, Ens]),
         G2 =.. [_ | A2],
         once(replace_vars_in_all(Ens, Ens2, Vi, V1, 1)),
-        %writef('pre replace vars: %w\npost replace vars: %w\n', [Ens, Ens2]),
+        %writef('pre replace vars: ~w\npost replace vars: ~w\n', [Ens, Ens2]),
         %force(write('a\n')),
-        %writef('check_chs Ens2 = %w\n', [Ens2]),
+        %writef('check_chs Ens2 = ~w\n', [Ens2]),
         match_neg(A2, Ens2, V1, V2, Rval),
         %force(write('b\n')),
         (Rval = 0 ->
                 !,
                 %fill_in_variable_values(G, G3, [], _, V2),
-                %writef('%w failing based on negation %w\n', [F, G3]),
+                %writef('~w failing based on negation ~w\n', [F, G3]),
                 fail
         ;
                 %fill_in_variable_values(G2, G3, [], _, V2),
-                %writef('chs got negation %w for %w\n', [G3, F]),
+                %writef('chs got negation ~w for ~w\n', [G3, F]),
                 true
         ), % if we run out of values, fail without backtracking
         once(check_chs2(F, A2, V2, Vo, C, Cs, Flag, Eloop)), % test new values
@@ -240,7 +240,7 @@ match_neg(A, As, Vi, Vo, R) :-
         As \= [],
         A \= [],
         once(select_heads(As, _, Hs)), % get heads from each entry in As
-        %force(writef('mn testing %w against %w\n', [A, Hs])),
+        %force(writef('mn testing ~w against ~w\n', [A, Hs])),
         match_neg2(A, Hs, As, Vi, Vo, R).
         %force(write('mn success b\n')).
 match_neg(_, _, _, _, 0) :- % out of values
@@ -263,7 +263,7 @@ match_neg2([X | _], Cs, _, Vi, Vo, 1) :-
         once(split_neg_matches(Cs, Cc, B, Lv, Vi)), % also handles failure on unbound non-loop variable
         %write('mna\n'),
         once(intersect_all(Cc, C)),
-        %writef('testing %w against %w and %w, Lv = %w\n', [X, C, B, Lv]),
+        %writef('testing ~w against ~w and ~w, Lv = ~w\n', [X, C, B, Lv]),
         match_neg_test(X, C, B, Lv, Vi, Vo), % tests passed if this succeeds
         %writef('test passed!\n'),
         (\+is_unbound(X, Vi, _, _, _) ->
@@ -271,19 +271,19 @@ match_neg2([X | _], Cs, _, Vi, Vo, 1) :-
         ;
                 true
         ).%,
-        %writef('matchneg test passed for %w\n', [X]).
+        %writef('matchneg test passed for ~w\n', [X]).
 match_neg2([X | T], _, D, Vi, Vo, R) :-
         is_ground(X, Vi),
         !,
         once(remove_satisfied_constraints(X, D, D2, Vi, _)), % we can ignore variable changes, since they only affect the heads we're removing
         once(select_heads(D2, D3, _)), % remove entries for current arg
-        %writef('testing %w against %w\n', [T, D3]),
+        %writef('testing ~w against ~w\n', [T, D3]),
         match_neg(T, D3, Vi, Vo, R),
         !.
 match_neg2([_ | T], _, D, Vi, Vo, R) :-
-        %writef('c: %w\n', [D2]),
+        %writef('c: ~w\n', [D2]),
         once(select_heads(D, D2, _)), % remove entries for current arg
-        %writef('testing %w against %w\n', [T, D3]),
+        %writef('testing ~w against ~w\n', [T, D3]),
         match_neg(T, D2, Vi, Vo, R). %,
         %force(write('mn2 b\n')).
 
@@ -513,21 +513,21 @@ check_negations(G, [X | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
         predicate(X, F2, _),
         is_dual(F2),
         predicate(G, F, _),
-        %writef('cn a: %w vs %w\n', [G, X]),
+        %writef('cn a: ~w vs ~w\n', [G, X]),
         F \= F2, % not a match
         !,
         check_negations(G, T, Vi, Vo, 1, R, C, Cv).
 check_negations(G, [X | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
         predicate(X, F, _),
         is_dual(F),
-        %writef('cn b: %w vs %w\n', [G, X]),
+        %writef('cn b: ~w vs ~w\n', [G, X]),
         \+solve_unify(G, X, Vi, _, 1), % not a match
         !,
         check_negations(G, T, Vi, Vo, 1, R, C, Cv).
 check_negations(G, [X | T], Vi, Vo, N, R, C, Cv) :- % Match found
         predicate(G, F, A1),
         predicate(X, F, A2),
-        %writef('cn c: %w vs %w\nVi = %w', [G, X,Vi]),
+        %writef('cn c: ~w vs ~w\nVi = ~w', [G, X,Vi]),
         solve_unify(G, X, Vi, V2, 1),
         !,
         chs_entry(E1, F, A1, _, _),
@@ -587,11 +587,11 @@ add_to_chs(F, A, S, N, E, Ev, Vi, Vo, CHSi, CHSo) :- % not already present
         ;
                 rb_insert(CHSi, F, [E], CHSo) % New entry for predicate
         ),
-        %writef('chs added %w\n', [E]),
+        %writef('chs added ~w\n', [E]),
         !.
 add_to_chs(F, A, S, _, E, _, V, V, CHS, CHS) :- % already present; skip
         chs_entry(E, F, A, S, _).%,
-        %writef('chs failed to add %w (already present)\n', [E]).
+        %writef('chs failed to add ~w (already present)\n', [E]).
         %!,
         %fail. % don't allow duplicate entry to succeed, as it will have already done so once via CHS and failed
 

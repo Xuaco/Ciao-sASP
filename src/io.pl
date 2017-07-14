@@ -1,8 +1,8 @@
-:- module(io,
-        [
-                load_source_files/1,
-                read_query/2
-        ]).
+:- module(io, _).
+        % [
+        %         load_source_files/1,
+        %         read_query/2
+        % ]).
 
 /** <module> Handle opening and closing files and directing output
 
@@ -42,7 +42,10 @@ even if an error occurs.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+:-set_prolog_flag(multi_arity_warnings,off).
+
 :- use_module(library(lists)).
+:- use_module(ciao_auxiliar).
 :- use_module(common).
 %:- use_module(debug).
 :- use_module(program).
@@ -78,17 +81,17 @@ load_source_files(_) :-
 % @param ErrorsOut Output error count.
 load_source_files([X | T], Si, So, Ei, Eo) :-
         absolute_file_name(X, X2),
-        write_verbose(0, 'Loading file %w...\n', [X2]),
+        write_verbose(0, 'Loading file ~w...\n', [X2]),
         once(input(X2, CharPairs)),
         once(tokenize(CharPairs, Toks)),
-        %writef('got tokens: %w\n\n', [Toks]),
+        %writef('got tokens: ~w\n\n', [Toks]),
         once(parse_program(Toks, S, D, E)),
         E2 is Ei + E,
-        %writef('got statements %w\n', [S]),
-        %writef('got directives %w\n', [D]),
+        %writef('got statements ~w\n', [S]),
+        %writef('got directives ~w\n', [D]),
         append(Si, S, S2),
         once(process_directives(D, X2, S2, S3, T, T2)),
-        %writef('loaded file %w\n', [X]),
+        %writef('loaded file ~w\n', [X]),
         !,
         load_source_files(T2, S3, So, E2, Eo).
 load_source_files([], S, S, E, E) :-
@@ -105,7 +108,7 @@ load_source_files([], S, S, E, E) :-
 % @param FilesIn Input list of files.
 % @param FilesOut Output list of files.
 process_directives([include(X) | T], C, Si, So, Fsi, [X2 | Fso]) :-
-        absolute_file_name(X, X2, [relative_to(C)]), % resolve relative to current file
+	absolute_file_name(X, X2, [relative_to(C)]), % resolve relative to current file
         !, % include directive
         process_directives(T, C, Si, So, Fsi, Fso).
 process_directives([abducible(X) | T], C, Si, So, Fsi, Fso) :-
@@ -130,7 +133,7 @@ process_directives([c(X, Y) | T], C, Si, So, Fsi, Fso) :-
         !, % include directive
         process_directives(T, C, S2, So, Fsi, Fso).
 process_directives([X | _], _, _, _, _, _) :-
-        write_error('Could not process directive: %w\n', [X]),
+        write_error('Could not process directive: ~w\n', [X]),
         !,
         fail.
 process_directives([], _, S, S, F, F) :-
@@ -181,25 +184,32 @@ input2(Sread, _, _) :- % close the file even if tokenizer fails
 % @param Stream Stream to use for input.
 open_input(File, Stream) :-
         nonvar(File),
-        prolog_to_os_filename(File2, File),
-        access_file(File2, read),
-        open_file(File2, Stream, read),
-        !.
+        % prolog_to_os_filename(File2, File),
+        % access_file(File2, read),
+        % open_file(File2, Stream, read),
+	(
+	    open(File,read,Stream)->
+	    !
+	;
+	    write_error('file \'~w\' does not exist or cannot be open for reading', [File]),
+	    !,
+	    fail
+	).	    
 open_input(File, current_input) :-
         var(File),
         !.
-open_input(File, _) :-
-        nonvar(File),
-        \+exists_file(File),
-        write_error('file \'%w\' does not exist', [File]),
-        !,
-        fail.
-open_input(File, _) :-
-        nonvar(File),
-        \+access_file(File, read),
-        write_error('cannot open file \'%w\' for reading', [File]),
-        !,
-        fail.
+% open_input(File, _) :-
+%         nonvar(File),
+%         \+exists_file(File),
+%         write_error('file \'~w\' does not exist', [File]),
+%         !,
+%         fail.
+% open_input(File, _) :-
+%         nonvar(File),
+%         \+access_file(File, read),
+%         write_error('cannot open file \'~w\' for reading', [File]),
+%         !,
+%         fail.
 open_input(_, _) :-
         write(user_error, 'One or more errors occured while accessing input!\n'),
         !,
@@ -336,3 +346,7 @@ add_positions2([C | T], [C2 | T2], Source, Line, Col) :-
         Col2 is Col + 1,
         add_positions2(T, T2, Source, Line, Col2).
 add_positions2([], [], _, _, _).
+
+
+
+

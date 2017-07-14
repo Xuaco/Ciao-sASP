@@ -1,9 +1,13 @@
-s(ASP) 1.0.7 -- Ungrounded Stable Model Semantics
-=================================================
+c(ASP) 0.0.1 -- Ungrounded Stable Model Semantics in CIAO
+=========================================================
 
-Project page: <https://sourceforge.net/projects/sasp-system/>
+Project based on s(ASP) 1.0.7 from University of Texas in Dallas:
+<https://sourceforge.net/projects/sasp-system/>
+by [Kyle Marple](kmarple1@hotmail.com).
 
-By [Kyle Marple](kmarple1@hotmail.com).
+c(ASP) proyect:
+<https://github.com/Xuaco/casp>
+by [Joaquin Arias](joaquin.arias@imdea.org).
 
 
 Table of Contents
@@ -21,24 +25,28 @@ Table of Contents
 + 6.5. Loop Variables
 + 6.6. Arithmetic and Comparisons
 7. Restrictions on Input Programs
-8. Applications Using s(ASP)
+8. Applications Using s(ASP) / c(ASP)
 
 
 1. Description
 --------------
 
-The s(ASP) system is an implementation of the stable model semantics which does
-not require any form of grounding. Unlike similar systems, it can work with
-programs which have no finite grounding, as well as accept lists and terms as
-predicate arguments.
+The c(ASP) system is the CIAO version of s(ASP). The s(ASP) system is
+an implementation of the stable model semantics which does not require
+any form of grounding. Unlike similar systems, it can work with
+programs which have no finite grounding, as well as accept lists and
+terms as predicate arguments.
 
 
 2. License
 ----------
 
-The s(ASP) system is distributed under the 3-clause BSD license (a.k.a. BSD-3,
-Modified BSD License or New BSD License). See the file COPYING for the full text
-of the license.
+The c(ASP) system is distributeed under similar condition of the
+s(ASP) system without reference to the UTD.
+
+The s(ASP) system is distributed under the 3-clause BSD license
+(a.k.a. BSD-3, Modified BSD License or New BSD License). See the file
+COPYING for the full text of the license.
 
 
 3. Package Contents
@@ -49,46 +57,29 @@ directories:
 
  * src/ -- Source code directory
  * test/ -- Test directory containing several sample programs
- * CHANGES -- Changelog
  * COPYING -- 3-Clause BSD License
- * INSTALL -- Dummy file, just directs the reader here
- * Makefile -- Makefile for systems which support the 'make' command
  * README -- This file
- * README.pdf -- A PDF version of this file
- * README.tex -- A latex version of this file
- * winmake.bat -- A simple compilation script for Windows
 
  
 4. Installation
 ---------------
 
-Building s(ASP) requires SWI Prolog to be installed on the local machine. The
-system has been tested using SWI Prolog version 7.x.x and may be incompatible
-with older versions. Use of the 64-bit version of SWI Prolog is highly
-recommended. The 32-bit version restricts memory allocation in such a way that
-some s(ASP) programs may fail to run due to insufficient stack space. Finally,
-the compilation methods below assume that it may be invoked using the 'swipl'
-command.
+Building c(ASP) requires CIAO Prolog to be installed on the local
+machine. The system has been tested using CIAO Prolog on a Mac.
 
-Prior to compiling s(ASP), you may wish to change the default settings for
-execution mode, number of answer sets and stack size. This can be done by
-editing the file 'src/config.pl'. The various options are explained in the
-comments of that file.
+The following command can be executed from a command prompt in the
+'src/' directory:
 
-There are three methods for compiling s(ASP). On systems which support the
-'make' command, the included Makefile can be used. On Windows systems without
-access to the 'make' command, the included 'winmake.bat' may be used. Finally,
-the following command can be executed from a command prompt in the 'src/'
-directory:
-    swipl -L0 -G0 -T0 --goal=main --stand_alone=true -o sasp -c main.pl
-In all three cases, compilation will produce the executable 'sasp',
-which can then be moved as necessary.
+       ciao -x -o casp main.pl
+
+Compilation will produce the executable 'casp', which can then be
+moved as necessary.
 
 
 5. Usage
 --------
 
-The s(ASP) system accepts modified normal logic programs (see Input Program
+The c(ASP) system accepts modified normal logic programs (see Input Program
 Format below) and executes them under the stable model semantics. Two modes of
 execution are supported: automatic and interactive.
 
@@ -102,7 +93,7 @@ provided with a prompt to enter queries. Answers can then be accepted by
 pressing '.' or rejected by pressing ';'. Pressing 'h' at the prompt will
 explain both options.
 
-The general format for invoking s(ASP) is:
+The general format for invoking c(ASP) is:
     sasp [options] <inputfile(s)>
 The available options are:
     -h, -?, --help     Print this help message and terminate.
@@ -113,19 +104,20 @@ The available options are:
     -v, --verbose      Enable verbose progress messages.
     -vv, --veryverbose Enable very verbose progress messages.
     -j                 Print proof tree for each solution.
+    -w                 Generate html file with proof tree for each solution.
     -n                 Hide goals added to solution by global consistency checks.
     -la                Print a separate list of succeeding abducibles with each
                        CHS. List will only be printed if at least one abducible
                        has succeeded.
 For example,
-    sasp -i test1.lp
+    casp -i test1.lp
 will execute the program 'test1.lp' in interactive mode.
 
 
 6. Input Program Format
 -----------------------
 
-The format for s(ASP) programs is that of normal logic programs (NLPs) with a
+The format for c(ASP) programs is that of normal logic programs (NLPs) with a
 number of optional modifications. These modifications are hard-coded queries,
 the ability to suppress specific predicates from output, a number of special
 directive statements, negatively constrained variables and support for
@@ -156,7 +148,7 @@ program, all but the last will be silently discarded.
 
 +++ 6.2 Hiding Predicates in Output
 
-As the models returned by s(ASP) can be quite large, it is often desirable to
+As the models returned by c(ASP) can be quite large, it is often desirable to
 omit unwanted predicates from the output. This can be done by appending an
 underscore ('_') character to the beginning of the predicate name. Such
 predicates will be executed normally, but neither they nor their negations will
@@ -174,7 +166,7 @@ only { p } will be printed.
 +++ 6.3 Directive Statements
 
 In addition to the #compute statement discussed above, two other special
-statements are supported by s(ASP): #include and #abducible.
+statements are supported by c(ASP): #include and #abducible.
 
 The #include statement is used to include additional source files, allowing a
 program to be broken up across multiple files. Two formats are allowed:
@@ -188,7 +180,7 @@ be specified:
     #include '../somedir/somefile.lp'.
     #include 'C:\somedir\somefile.lp'. % Windows-specific
 
-The #abducible statement is included to simplify the use of s(ASP) for
+The #abducible statement is included to simplify the use of c(ASP) for
 abduction. Abducibles may be specified as follows:
     #abducible some_goal(X, Y).
 This simply means that the specified goal may or may not be true. If encountered
@@ -199,7 +191,7 @@ the goal.
 +++ 6.4 Negatively Constrained Variables
 
 In most logic programming systems, variables may be either bound or unbound. In
-s(ASP), VARIABLES MAY BE EITHER BOUND OR NEGATIVELY CONSTRAINED. A negatively
+c(ASP), VARIABLES MAY BE EITHER BOUND OR NEGATIVELY CONSTRAINED. A negatively
 constrained variable is associated with a PROHIBITED VALUE SET, a list of ground
 values which the variable cannot be bound to. Unbound variables are treated as a
 special case of negatively constrained variables in which the prohibited value
@@ -209,7 +201,7 @@ Values are added to the prohibited value set via DISUNIFICATION. Consider the
 following examples
     X \= 5, X \= a.
 Under most logic programming semantics, both of the above statements would fail,
-since an unbound variable can be bound to any value. However, in s(ASP), both
+since an unbound variable can be bound to any value. However, in c(ASP), both
 statements will succeed, adding '5' and 'a' to X's prohibited value list. Any
 later attempt to bind X to one of these values will fail.
 
@@ -233,15 +225,15 @@ infinite number of partial stable models. This is because predicates containing
 the loop variable may be true or false for every value in the loop variable's 
 domain.
 
-The s(ASP) system compactly represents these cases by prefixing loop variables
-with a '?' in s(ASP)'s output. For example, consider the following program with
+The c(ASP) system compactly represents these cases by prefixing loop variables
+with a '?' in c(ASP)'s output. For example, consider the following program with
 the query '?- p(X).': 
     p(X) :- not q(X).
     q(X) :- not p(X).
 An infinite number of partial stable models exist for this program, such as:
     { p(1), q(2), not p(2), not q(1) }
     { p(1), q(a), q(b), not p(a), not p(b), not q(1) }
-and so on. However, s(ASP) will produce only the following result:
+and so on. However, c(ASP) will produce only the following result:
     { p(?X), not q(?X) }
 This concisely represents that, for each value of ?X, p/1 and q/1 may be either
 true or false, so long as they are not both true or both false for the same
@@ -250,7 +242,7 @@ value.
 
 +++ 6.6 Arithmetic and Comparisons
 
-The s(ASP) system provides a number of built-in, inline operators, described
+The c(ASP) system provides a number of built-in, inline operators, described
 below.
 
 The two most important operators are unification ('=') and disunification
@@ -289,7 +281,7 @@ mod		Modulus (integers only)
 7. Restrictions on Input Programs
 ---------------------------------
 
-In addition to the accepted program format, s(ASP) places three limitations on
+In addition to the accepted program format, c(ASP) places three limitations on
 what constitutes a 'legal' program. First, as in Prolog, arithmetic statements
 must be ground at the time they are evaluated. For example, the statement
     X is Y + 2
@@ -304,21 +296,22 @@ with X. Finally, programs cannot allow success through left recursion. This
 final restriction is a limitation of the current implementation, and we hope to
 remove it in a future release.
 
-8. Applications Using s(ASP)
-----------------------------
+8. Applications Using s(ASP) / c(ASP)
+-------------------------------------
 
-Below are links to projects and papers which use s(ASP). If you would like your
-project to be listed in future releases, please contact us using the email
-address at the beginning of this file.
+Below are links to projects and papers which use s(ASP):
 
-s(ASP) Hackathon (https://hackai16.devpost.com/submissions) UT Dallas's AI
-Society held a 24-hour s(ASP) hackathon on November 5-6, 2016. 18 projects were
-submitted by teams involving ~60 UTD students.
+1- s(ASP) Hackathon (https://hackai16.devpost.com/submissions) UT
+Dallas's AI Society held a 24-hour s(ASP) hackathon on November 5-6,
+2016. 18 projects were submitted by teams involving ~60 UTD students.
 
-Zhuo Chen, Kyle Marple, Elmer Salazar, Gopal Gupta, Lakshman Tamil: A Physician
-Advisory System for Chronic Heart Failure Management Based on Knowledge
-Patterns. TPLP 16(5-6): 604-618 (2016) (https://arxiv.org/abs/1610.08115)
+2- Zhuo Chen, Kyle Marple, Elmer Salazar, Gopal Gupta, Lakshman Tamil:
+A Physician Advisory System for Chronic Heart Failure Management Based
+on Knowledge Patterns. TPLP 16(5-6): 604-618 (2016)
+(https://arxiv.org/abs/1610.08115)
 
-Degree Audit Program (https://gitlab.com/saikiran1096/gradaudit/) A program to
-determine if a student has enough credits to graduate and display courses needed
-fulfill unmet requirements.
+3- Degree Audit Program (https://gitlab.com/saikiran1096/gradaudit/) A
+program to determine if a student has enough credits to graduate and
+display courses needed fulfill unmet requirements.
+
+In the future more application could be developed using c(ASP).

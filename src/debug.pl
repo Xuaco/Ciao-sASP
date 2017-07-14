@@ -42,7 +42,8 @@ release.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-:- use_module(library(writef)).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(common).
 :- use_module(options).
 :- use_module(output). % for formatting and metacalls to fill_in_variable_values/5.
@@ -64,7 +65,7 @@ debugging(X) :-
 %
 % @param List The list to write.
 write_list([X | T]) :-
-        writef('%w\n', [X]),
+        writef('~w\n', [X]),
         !,
         write_list(T).
 write_list([]).
@@ -78,13 +79,13 @@ write_program :-
         new_var_struct(V),
         (defined_nmr_check(NMR) ->
                 format_term_list(NMR, NMR2, _, V),
-                writef('\nNMR Check:\n%w\n', [NMR2])
+                writef('\nNMR Check:\n~w\n', [NMR2])
         ;
                 true
         ),
         (defined_query(Q, _) ->
                 format_term_list(Q, Q2, _, V),
-                writef('\nQuery\n%w\n', [Q2])
+                writef('\nQuery\n~w\n', [Q2])
         ;
                 true
         ),
@@ -108,7 +109,7 @@ write_rules([X | T], Lh) :-
         ),
         new_var_struct(V),
         format_term(H, H2, _, V),
-        writef('%w', [H2]),
+        writef('~w', [H2]),
         write_body(B),
         writef('.\n'),
         !,
@@ -122,7 +123,7 @@ write_rules([], _).
 write_body([X | T]) :-
         new_var_struct(V),
         format_term(X, X2, _, V),
-        writef(' :-\n\t%w', [X2]),
+        writef(' :-\n\t~w', [X2]),
         write_body2(T).
 write_body([]).
 
@@ -133,7 +134,7 @@ write_body([]).
 write_body2([X | T]) :-
         new_var_struct(V),
         format_term(X, X2, _, V),
-        writef(',\n\t%w', [X2]),
+        writef(',\n\t~w', [X2]),
         !,
         write_body2(T).
 write_body2([]).

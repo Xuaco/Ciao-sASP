@@ -44,6 +44,7 @@ set using the provided query.
 */
 
 :- use_module(library(lists)).
+:- use_module(ciao_auxiliar).
 :- use_module(chs).
 :- use_module(common).
 :- use_module(debug).
@@ -109,6 +110,10 @@ auto_solve(N) :-
         %force(write('as\n')),
         solve_goals(Q2, Vi, Vo, CHSi, CHSo, [], _, J, 0), % find an answer set
         if_debug(1, write('SOLUTION FOUND! PRINTING CHS:\n')),
+        b_getval(ans_cnt, I), % ans_cnt won't reset on backtracking
+        I2 is I + 1,
+        nb_setval(ans_cnt, I2),
+	format('Answer: ~w\n',[I2]),
         once(print_chs(CHSo, Vo, 0)),
         once(print_vars(Qv, Vo)),
         if_debug(2, print_var_struct(Vo)),
@@ -122,10 +127,12 @@ auto_solve(N) :-
         ;
                 true
         ),
+        (user_option(html_justification, true) ->
+                print_html(J,[Q,CHSo,Qv,Vo])
+        ;
+                true
+        ),
         nl, nl,
-        b_getval(ans_cnt, I), % ans_cnt won't reset on backtracking
-        I2 is I + 1,
-        nb_setval(ans_cnt, I2),
         (I2 =\= N -> % Never true for N < 0 (find all)
                 fail % backtrack to find the required number of answer sets
         ;
@@ -146,6 +153,8 @@ auto_solve(_) :-
 %        list containing calling a built-in such as 'exit'.
 user_solve(['exit_0']) :-
         !. % exit
+user_solve(['halt_0']) :-
+        !. % exit
 user_solve(Q) :-
         body_vars2(Q, [], [], Qv), % get query variables for printing with solutions
         defined_nmr_check(NMR),
@@ -164,6 +173,11 @@ user_solve(Q) :-
         ),
         (user_option(justification, true) ->
                 print_justification(J)
+        ;
+                true
+        ),
+        (user_option(html_justification, true) ->
+                print_html(J,[Q,CHSo,Qv,Vo])
         ;
                 true
         ),
@@ -198,7 +212,7 @@ solve_goals([X | T], Vi, Vo, CHSi, CHSo, Cs, E, [Jg | Jt], NMR) :-
                 format_term(X, X2, C, Vi),
                 length(Cs, L),
                 indent(L),
-                writef('CALL (%w): current goal is %w (', [L, X2]),
+                writef('CALL (~w): current goal is ~w (', [L, X2]),
                 print_var_constraints(C),
                 write(')'),
                 nl,
@@ -211,16 +225,16 @@ solve_goals([X | T], Vi, Vo, CHSi, CHSo, Cs, E, [Jg | Jt], NMR) :-
         ),
         %force(write('sgs\n')),
         solve_goal(X, Vi, V1, CHSi, CHS1, Cs, E1, Jg, NMR2),
-        %force(writef('sgs post %w\n', [X])),
+        %force(writef('sgs post ~w\n', [X])),
         %fill_in_variable_values(X, Xp, [], _, V1),
-        %force(writef('post-s2s3: %w\n', [Xp])),
+        %force(writef('post-s2s3: ~w\n', [Xp])),
         if_debug(1, (
                 format_term(X, X3, C2, V1),
                 format_term_list(T, T2, _, V1),
                 indent(L),
-                writef('FIN: (%w): fin goal %w (', [L, X3]),
+                writef('FIN: (~w): fin goal ~w (', [L, X3]),
                 print_var_constraints(C2),
-                writef('), T = %w\n', [T2])
+                writef('), T = ~w\n', [T2])
                 )),
         %force(write('solve_goals solve_goals\n')),
         solve_goals(T, V1, Vo, CHS1, CHSo, Cs, E2, Jt, NMR),
@@ -276,7 +290,7 @@ solve_goal(G, Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :-
         %force(write('sg\n')),
         solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, J, NMR).
 solve_goal(G, _, _, _, _, _, _, _, _) :-
-        write_error('encountered invalid goal %w', [G]),
+        write_error('encountered invalid goal ~w', [G]),
         !,
         fail.
 
@@ -304,17 +318,17 @@ solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, -(Gj, Cj, [J]), NMR) :-
         format_term(G, Gj, Cj, Vi),
         if_debug(5, (
                 format_term(G, Gp, C, Vi),
-                writef('SP: check chs: %w (', [Gp]),
+                writef('SP: check chs: ~w (', [Gp]),
                 print_var_constraints(C),
                 write(') against: '),
                 once(print_chs(CHSi, Vi, 0)), nl
                 )),
         %force(write('pre-chsa\n')),
         check_chs(Fn, A, Vi, V1, CHSi, Cs, Cflag, El),
-        %force(writef('post-chs a: %w\n', [Fn])),
+        %force(writef('post-chs a: ~w\n', [Fn])),
         if_debug(5, (
                 format_term(G, Gp2, C2, V1),
-                writef('SP: chs check got flag: %w for %w (', [Cflag, Gp2]),
+                writef('SP: chs check got flag: ~w for ~w (', [Cflag, Gp2]),
                 print_var_constraints(C2),
                 write(')'), nl
                 )),
@@ -323,7 +337,7 @@ solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, -(Gj, Cj, [J]), NMR) :-
                 (Cflag =:= 1 ->
                         G3 =.. [Fn | A],
                         format_term(G3, G4, C3, V1),
-                        writef('SP: chs success, goal is now %w (', [G4]),
+                        writef('SP: chs success, goal is now ~w (', [G4]),
                         print_var_constraints(C3),
                         write(')\n')
                 ;
@@ -339,17 +353,17 @@ solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, -(Gj, Cj, [J]), NMR) :-
         format_term(G, Gj, Cj, Vi),
         if_debug(5, (
                 format_term(G, Gp, C, Vi),
-                writef('SP: check chs: %w (', [Gp]),
+                writef('SP: check chs: ~w (', [Gp]),
                 print_var_constraints(C),
                 write(') against: '),
                 once(print_chs(CHSi, Vi, 0)), nl
                 )),
         %force(write('pre-chs b\n')),
         check_chs(F, A, Vi, V1, CHSi, Cs, Cflag, El),
-        %force(writef('post-chs b: %w\n', [F])),
+        %force(writef('post-chs b: ~w\n', [F])),
         if_debug(5, (
                 format_term(G, Gp2, C2, V1),
-                writef('SP: chs check got flag: %w for %w (', [Cflag, Gp2]),
+                writef('SP: chs check got flag: ~w for ~w (', [Cflag, Gp2]),
                 print_var_constraints(C2),
                 write(')'), nl
                 )),
@@ -393,14 +407,14 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
         format_term(G, G2, C, Vi),
         if_debug(4, (
                 format_term(G, G2, C, Vi),
-                writef('EC: add to chs %w (', [G2]),
+                writef('EC: add to chs ~w (', [G2]),
                 print_var_constraints(C),
                 write(')'), nl
                 )),
         once(add_to_chs(F, A, 0, NMR, E, [], Vi, V1, CHSi, CHS1)),
         if_debug(4, (
                 format_term(G, G3, C2, V1),
-                writef('EC: added to chs %w (', [G3]),
+                writef('EC: added to chs ~w (', [G3]),
                 print_var_constraints(C2),
                 write(')'), nl
                 )),
@@ -408,9 +422,9 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
         if_debug(4, (
                 format_term(G, G4, C3, V1),
                 format_term_list(Rs, Rs2, _, V1),
-                writef('EC: expanding %w (', [G4]),
+                writef('EC: expanding ~w (', [G4]),
                 print_var_constraints(C3),
-                writef(') with rules %w\n', [Rs2])
+                writef(') with rules ~w\n', [Rs2])
                 )),
         expand_call2(G, Rs, V1, V2, CHS1, CHS2, [G | Cs], E1, J, NMR), % expand
         remove_from_chs(E, CHS2, CHS3), % remove original goal from CHS
@@ -419,7 +433,7 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
         remove_cycle_heads(E1, Eo),
         if_debug(3, (
                 format_term(G, G5, C4, Vo),
-                writef('EC: CHS marked success for %w (\n', [G5]),
+                writef('EC: CHS marked success for ~w (\n', [G5]),
                 print_var_constraints(C4),
                 write(')'), nl
                 )).
@@ -448,9 +462,9 @@ expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(G2), C, Js), 
         if_debug(3, (
                 format_term(G, G3, C2, V1),
                 format_term(H2, H3, _, V1),
-                writef('trying to unify %w (', [G3]),
+                writef('trying to unify ~w (', [G3]),
                 print_var_constraints(C2),
-                writef(') with %w\n', [H3])
+                writef(') with ~w\n', [H3])
                 )),
         solve_unify(G, H2, V1, V2, 0), % unify goal and head args
         format_term(G, G2, C, V2), % fill in variables, strip prefixes, etc.
@@ -459,9 +473,9 @@ expand_call2(G, [_ | T], Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :- % not a match or 
         if_debug(2, (
                 format_term(G, G2, C, Vi),
                 format_term_list(T, T2, _, Vi),
-                writef('no match or backtracking for %w (', [G2]),
+                writef('no match or backtracking for ~w (', [G2]),
                 print_var_constraints(C),
-                writef('), T = %w!\n', [T2])
+                writef('), T = ~w!\n', [T2])
                 )),
         !,
         expand_call2(G, T, Vi, Vo, CHSi, CHSo, Cs, E, J, NMR).
@@ -606,7 +620,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(V2, V22, _, Vi),
-                        fatal_error('is/2 expects RHS to be a function or a number, got %w', [V22])
+                        fatal_error('is/2 expects RHS to be a function or a number, got ~w', [V22])
                 )
              ),
         update_var_value(G1, val(V2), Vi, Vo),
@@ -622,7 +636,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(V2, V22, _, Vi),
-                        fatal_error('is/2 expects RHS to be a function or a number, got %w', [V22])
+                        fatal_error('is/2 expects RHS to be a function or a number, got ~w', [V22])
                 )
              ),
         \+member(V2, V1), % V2 is not ruled out by constraints
@@ -637,7 +651,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(V1, V12, _, Vi),
-                        fatal_error('is/2 expects LHS to be a number when bound, got %w', [V12])
+                        fatal_error('is/2 expects LHS to be a number when bound, got ~w', [V12])
                 )
              ),
         solve_subexpr(G2, Vi, V2),
@@ -646,7 +660,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(V2, V22, _, Vi),
-                        fatal_error('is/2 expects RHS to be a function or a number, got %w', [V22])
+                        fatal_error('is/2 expects RHS to be a function or a number, got ~w', [V22])
                 )
              ),
         solve_unify(V1, V2, Vi, Vo, 0),
@@ -660,7 +674,7 @@ solve_expression(is(G1, G2), Vi, Vo) :- % possibly covered by case 3 above
                 invalid_type,
                 (
                         format_term(V2, V22, _, Vi),
-                        fatal_error('is/2 expects RHS to be a function or a number, got %w', [V22])
+                        fatal_error('is/2 expects RHS to be a function or a number, got ~w', [V22])
                 )
              ),
         update_var_value(G1, val(V2), Vi, Vo),
@@ -671,7 +685,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(G1, G12, _, Vi),
-                        fatal_error('is/2 expects LHS to be a number when bound, got %w', [G12])
+                        fatal_error('is/2 expects LHS to be a number when bound, got ~w', [G12])
                 )
              ),
         !,
@@ -681,7 +695,7 @@ solve_expression(is(G1, G2), Vi, Vo) :-
                 invalid_type,
                 (
                         format_term(V2, V22, _, Vi),
-                        fatal_error('is/2 expects RHS to be a function or a number, got %w', [V22])
+                        fatal_error('is/2 expects RHS to be a function or a number, got ~w', [V22])
                 )
              ),
         solve_unify(G1, V2, Vi, Vo, 0),
@@ -695,7 +709,7 @@ solve_expression(=:=(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('=:=/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('=:=/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 =:= V2,
@@ -709,7 +723,7 @@ solve_expression(=\=(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('=\\=/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('=\\=/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 =\= V2,
@@ -723,7 +737,7 @@ solve_expression(>(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('>/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('>/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 > V2,
@@ -737,7 +751,7 @@ solve_expression(>=(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('>=/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('>=/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 >= V2,
@@ -751,7 +765,7 @@ solve_expression(<(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('</2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('</2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 < V2,
@@ -765,7 +779,7 @@ solve_expression(=<(G1, G2), V, V) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('=</2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('=</2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         V1 =< V2,
@@ -817,7 +831,7 @@ solve_subexpr(+(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('+/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('+/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 + V2,
@@ -831,7 +845,7 @@ solve_subexpr(-(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('-/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('-/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 - V2,
@@ -845,7 +859,7 @@ solve_subexpr(*(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('*/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('*/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 * V2,
@@ -859,7 +873,7 @@ solve_subexpr(/(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('=:=/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('=:=/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 / V2,
@@ -873,7 +887,7 @@ solve_subexpr(//(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('///2 expects both arguments to be integers, got %w and %w', [V12, V22])
+                        fatal_error('///2 expects both arguments to be integers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 // V2,
@@ -887,7 +901,7 @@ solve_subexpr(rem(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('rem/2 expects both arguments to be integers, got %w and %w', [V12, V22])
+                        fatal_error('rem/2 expects both arguments to be integers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 rem V2,
@@ -901,7 +915,7 @@ solve_subexpr(mod(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('mod/2 expects both arguments to be integers, got %w and %w', [V12, V22])
+                        fatal_error('mod/2 expects both arguments to be integers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 mod V2,
@@ -915,7 +929,7 @@ solve_subexpr(<<(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('<</2 expects both arguments to be integers, got %w and %w', [V12, V22])
+                        fatal_error('<</2 expects both arguments to be integers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 << V2,
@@ -929,7 +943,7 @@ solve_subexpr(>>(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('>>/2 expects both arguments to be integers, got %w and %w', [V12, V22])
+                        fatal_error('>>/2 expects both arguments to be integers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 >> V2,
@@ -943,7 +957,7 @@ solve_subexpr('**'(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('**/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('**/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 ** V2,
@@ -957,7 +971,7 @@ solve_subexpr('^'(G1, G2), V, Val) :-
                 (
                         format_term(V1, V12, _, V),
                         format_term(V2, V22, _, V),
-                        fatal_error('^/2 expects both arguments to be numbers, got %w and %w', [V12, V22])
+                        fatal_error('^/2 expects both arguments to be numbers, got ~w and ~w', [V12, V22])
                 )
              ),
         Val is V1 ^ V2,
@@ -994,7 +1008,7 @@ solve_unify(G1, G2, Vi, Vo, O) :- % var var, binding doesn't matter
         is_var(G1),
         is_var(G2),
         !,
-        %(G2 = 'Var17' -> var_value(G2, Vi, Val), writef('var17 = %w\n', [Val])
+        %(G2 = 'Var17' -> var_value(G2, Vi, Val), writef('var17 = ~w\n', [Val])
         %;
         %true),
         unify_vars(G1, G2, Vi, Vo, O).
@@ -1016,7 +1030,7 @@ solve_unify(G1, G2, Vi, Vo, O) :- % var atom/term
         \+is_var(G2),
         is_unbound(G1, Vi, C, F, _), % get any constraints
         !,
-        %writef('a trying to unify var %w with nonvar %w, F = %w\n', [G1, G2, F]),
+        %writef('a trying to unify var ~w with nonvar ~w, F = ~w\n', [G1, G2, F]),
         F \= 1, % var is bindable; else fail
         once(test_constraints(C, G2, Vi, V1)), % ensure constraints are satisfied.
         (O =:= 1 ->
@@ -1030,7 +1044,7 @@ solve_unify(G1, G2, Vi, Vo, O) :- % atom/term var
         \+is_var(G1),
         is_unbound(G2, Vi, C, F, _), % get any constraints
         !,
-        %writef('b trying to unify var %w with nonvar %w, F = %w\n', [G2, G1, F]),
+        %writef('b trying to unify var ~w with nonvar ~w, F = ~w\n', [G2, G1, F]),
         F \= 1, % var is bindable; else fail
         once(test_constraints(C, G1, Vi, V1)), % ensure constraints are satisfied.
         (O =:= 1 ->
@@ -1096,7 +1110,7 @@ solve_dnunify(G1, G2, V, _, 1) :- % both unbound vars
         is_unbound(G1, V, _, _, _),
         is_unbound(G2, V, _, _, _),
         !,
-        fatal_error('disunification expects at least one argument to be ground, got %w and %w', [G1, G2]).
+        fatal_error('disunification expects at least one argument to be ground, got ~w and ~w', [G1, G2]).
 solve_dnunify(G1, G2, Vi, Vo, 1) :- % G1 unbound
         is_unbound(G1, Vi, _, _, _),
         !,
@@ -1104,7 +1118,7 @@ solve_dnunify(G1, G2, Vi, Vo, 1) :- % G1 unbound
                 add_var_constraint(G1, G2, Vi, Vo)
         ;
                 format_term(G2, G22, _, Vi),
-                fatal_error('disunification expects at least one argument to be ground, got %w and %w', [G1, G22])
+                fatal_error('disunification expects at least one argument to be ground, got ~w and ~w', [G1, G22])
         ).
 solve_dnunify(G1, G2, Vi, Vo, 1) :- % G2 unbound
         is_unbound(G2, Vi, _, _, _),
@@ -1113,7 +1127,7 @@ solve_dnunify(G1, G2, Vi, Vo, 1) :- % G2 unbound
                 add_var_constraint(G2, G1, Vi, Vo)
         ;
                 format_term(G1, G12, _, Vi),
-                fatal_error('disunification expects at least one argument to be ground, got %w and %w', [G12, G2])
+                fatal_error('disunification expects at least one argument to be ground, got ~w and ~w', [G12, G2])
         ).
 solve_dnunify(G1, G2, V, V, 2) :- % atom atom
         is_atom(G1, V, Val),
@@ -1246,13 +1260,13 @@ solve_forall(V, G, Vi, Vo, Ci, Co, Cs, E, -(forall(Vj, Gj), C, Js), NMR) :-
         is_unbound(V, Vi, Old, _, _), % Variable must be unbound or constrained, else fail
         var_con(Val, Old, 1, -1), % variable CANNOT become a loop variable and flag must be stripped if present
         update_var_value(V, Val, Vi, V1), % set unbindable / unloopable
-        %force(writef('forall solve_goals: %w\n', [G])),
+        %force(writef('forall solve_goals: ~w\n', [G])),
         format_term(V, Vj, Cv, Vi), % fill in variables, strip prefixes, etc.
         format_term(G, Gj, Cg, Vi), % fill in variables, strip prefixes, etc.
         append(Cv, Cg, C),
         solve_goals([G], V1, V2, Ci, C1, Cs, E1, J, NMR), % solve once here
         %fill_in_variable_values(G, Gp, [], _, V1),
-        %force(writef('post forall solve_goals: %w\n', [Gp])),
+        %force(writef('post forall solve_goals: ~w\n', [Gp])),
         %force(chs:print_chs(C1, V1, 2)),
         solve_forall2(V, Old, G, V2, V3, C1, C2, Cs, E2, Jt, NMR), % pass original variable values
         append(J, Jt, Js),
@@ -1265,7 +1279,7 @@ solve_forall(V, G, Vi, Vo, Ci, Co, Cs, E, -(forall(Vj, Gj), C, Js), NMR) :-
         once(add_to_chs(F, A, 1, NMR, _, Ev, V5, Vo, C2, Co)), % add succeeding goal to CHS, but don't fail if already there
         if_debug(4, (
                 format_term(G2, G3, _, Vo),
-                writef('FORALL CHS marked success via forall for %w\n', [G3])
+                writef('FORALL CHS marked success via forall for ~w\n', [G3])
                 )).
         
 %! solve_forall2(+Var:list, +OldValue, +Goal:compound, +VarsIn:compound, -VarsOut:compound, +CHSin:list, -CHSout:list, +CallStack:list, -EvenLoops:list, -Justification:list, +InNMR:int)
@@ -1291,7 +1305,7 @@ solve_forall(V, G, Vi, Vo, Ci, Co, Cs, E, -(forall(Vj, Gj), C, Js), NMR) :-
 %        otherwise.
 solve_forall2(Var, _, _, V, V, C, C, _, [], [], _) :- % var is unbound; we're done
         is_unbound(Var, V, [], _, _),
-        if_debug(4, writef('solve forall: var %w is unbound\n', [Var])),
+        if_debug(4, writef('solve forall: var ~w is unbound\n', [Var])),
         !.
 solve_forall2(Var, Ov, G, Vi, Vo, Ci, Co, Cs, E, J, NMR) :-
         is_unbound(Var, Vi, Val, _, _),
@@ -1300,7 +1314,7 @@ solve_forall2(Var, Ov, G, Vi, Vo, Ci, Co, Cs, E, J, NMR) :-
         !,
         if_debug(4, (
                 format_term(Val, Val2, C, Vi),
-                writef('solve forall: var %w is constrained: %w', [Var, Val2]),
+                writef('solve forall: var ~w is constrained: ~w', [Var, Val2]),
                 print_var_constraints(C),
                 nl
                 )),
@@ -1313,7 +1327,7 @@ solve_forall2(Var, Ov, G, Vi, Vo, Ci, Co, Cs, E, J, NMR) :-
         list_diff(Val, Ov, Val2),
         if_debug(4, (
                 format_term(Val2, Val3, C, Vi),
-                writef('solve forall: var %w is constrained: %w', [Var, Val3]),
+                writef('solve forall: var ~w is constrained: ~w', [Var, Val3]),
                 print_var_constraints(C),
                 nl
                 )),
@@ -1322,7 +1336,7 @@ solve_forall2(Var, _, _, V, _, _, _, _, _, _, _) :-
         var_value(Var, V, Val),
         if_debug(4, (
                 format_term(Val, Val2, _, V),
-                writef('solve forall FAILING: Var %w is bound to %w!\n', [Var, Val2])
+                writef('solve forall FAILING: Var ~w is bound to ~w!\n', [Var, Val2])
                 )),
         !,
         fail.
@@ -1352,11 +1366,11 @@ solve_forall3(Var, [X | T], G, Vi, Vo, Ci, Co, Cs, E, [-(G3, C, J1) | Jt], NMR) 
         format_term(G2, G3, C, Vi),
         if_debug(4, (
                 format_term(X, X2, _, Vi),
-                writef('FORALL: calling %w with %w = %w\n', [G3, Var, X2])
+                writef('FORALL: calling ~w with ~w = ~w\n', [G3, Var, X2])
                 )),
-        %force(writef('forall3 solve_goals: %w\n', [G2])),
+        %force(writef('forall3 solve_goals: ~w\n', [G2])),
         solve_goals([G2], Vi, V1, Ci, C1, Cs, E1, J1, NMR), % call with ground value
-        %force(writef('back in forall3, T = %w, chs = %w\n', [T, C1])),
+        %force(writef('back in forall3, T = ~w, chs = ~w\n', [T, C1])),
         solve_forall3(Var, T, G, V1, Vo, C1, Co, Cs, E2, Jt, NMR),
         append(E1, E2, E).
 solve_forall3(_, [], _, V, V, C, C, _, [], [], _).
@@ -1412,3 +1426,5 @@ substitute2(X, Y, [G | T], [G2 | T2]) :-
         substitute2(X, Y, T, T2).
 substitute2(_, _, [], []) :-
         !.
+
+

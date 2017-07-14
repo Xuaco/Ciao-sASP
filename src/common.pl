@@ -56,8 +56,9 @@ Common and utility predicates that may be called from multiple locations.
 */
 
 :- use_module(library(lists)).
-:- use_module(library(writef)).
-%:- use_module(debug).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
+:- use_module(debug).
 :- use_module(options).
 :- use_module(variables).
 
@@ -196,10 +197,10 @@ create_unique_functor(Hi, C, Ho) :-
 %! fatal_error(+Format:string, +Arguments:list) is det
 % Call write_error/2 and then halt.
 %
-% @param Format A quoted string that would be passed to writef/2. '%w' specifies
+% @param Format A quoted string that would be passed to writef/2. '~w' specifies
 %        that the next element in Arguments should be printed.
 % @param Arguments A list of arguments that will be substituted, in order, for
-%        '%w' in Format.
+%        '~w' in Format.
 fatal_error(X, Y) :-
         write(user_error, 'FATAL '), % add to start of error message
         write_error(X, Y),
@@ -214,17 +215,17 @@ fatal_error(X, Y) :-
 % @param Format Anything that could be passed to write/1: a quoted string, a
 %        term, etc.
 write_error(X) :-
-        swritef(Msg, 'ERROR: %w.\n', [X]),
+        swritef(Msg, 'ERROR: ~w.\n', [X]),
         write(user_error, Msg).
 
 %! write_error(+Format:string, +Arguments:list) is det
 % Similar to write_error/1, except that arguments are filled in as with
 % writef/2.
 %
-% @param Format A quoted string that would be passed to writef/2. '%w' specifies
+% @param Format A quoted string that would be passed to writef/2. '~w' specifies
 %        that the next element in Arguments should be printed.
 % @param Arguments A list of arguments that will be substituted, in order, for
-%        '%w' in Format.
+%        '~w' in Format.
 write_error(X, Y) :-
         swritef(Z, X, Y), % Get string for main message
         write_error(Z).
@@ -259,10 +260,10 @@ write_verbose(_, _) :-
 % writef/2.
 %
 % @param Depth The indentation level of the message.
-% @param Format A quoted string in which '%w' will be replaced by the next item
+% @param Format A quoted string in which '~w' will be replaced by the next item
 %        in Arguments.
 % @param Arguments A list of arguments that will be substituted, in order, for
-%        '%w' in Format.
+%        '~w' in Format.
 write_verbose(0, Y, Z) :-
         user_option(verbose, 1),
         swritef(M, Y, Z), % Get message string

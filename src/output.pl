@@ -8,6 +8,7 @@
                         print_var_constraints/1,
                         indent/1,
                         print_justification/1,
+                        print_html/2,
                         print_abducibles/2
                      ]).
 
@@ -48,9 +49,12 @@ that may be used for warning and error output.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+:-set_prolog_flag(multi_arity_warnings,off).
+
 :- use_module(library(lists)).
-:- use_module(library(rbtrees)).
-:- use_module(library(writef)).
+:- use_module(rbtrees).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(chs).
 :- use_module(common).
 :- use_module(options).
@@ -136,9 +140,9 @@ print_chs2([X | T]) :-
         write('{ '),
         X = -(X2, Con),
         (X2 = not(X3) -> % print negation properly
-                writef('not %w', [X3])
+                writef('not ~w', [X3])
         ;
-                writef('%w', [X2])
+                writef('~w', [X2])
         ),
         (Con \= [] ->
                 write(' ( '),
@@ -160,9 +164,9 @@ print_chs2([]) :-
 print_chs3([X | T]) :-
         X = -(X2, Con),
         (X2 = not(X3) -> % print negation properly
-                writef(', not %w', [X3])
+                writef(', not ~w', [X3])
         ;
-                writef(', %w', [X2])
+                writef(', ~w', [X2])
         ),
         (Con \= [] ->
                 write(' ( '),
@@ -463,7 +467,7 @@ sort_chs([], []).
 sort_chs([X], [X]).
 sort_chs(Ci, Co) :-
         length(Ci, L),
-        L2 is L div 2,
+        L2 is L // 2,
         split_chs(Ci, Ca, Cb, L2),
         sort_chs(Ca, Ca2),
         sort_chs(Cb, Cb2),
@@ -658,7 +662,7 @@ print_vars3([]) :-
 % @param VarGroup The group of variables to print.
 % @param Value The value of the variables.
 print_vars4([X, Y | T], V) :- % at least two elements
-        writef('%w = %w', [X, Y]), % print first element here
+        writef('~w = ~w', [X, Y]), % print first element here
         !,
         print_vars5([Y | T], V). % print remaining elements
 print_vars4([X], V) :- % single-element list; constrained variable
@@ -668,7 +672,7 @@ print_vars4([X], V) :- % single-element list; constrained variable
 print_vars4([X], V) :- % single-element list; bound variable
         V = val(V2),
         !,
-        writef('%w = %w', [X, V2]).
+        writef('~w = ~w', [X, V2]).
 
 %! print_vars5(+VarGroup:list, +Value:compound) is det
 % Given a list of variables with the same value, print them. List must be
@@ -677,7 +681,7 @@ print_vars4([X], V) :- % single-element list; bound variable
 % @param VarGroup The group of variables to print.
 % @param Value The value of the variables.
 print_vars5([X, Y | T], V) :- % at least two elements
-        writef(', %w = %w', [X, Y]),
+        writef(', ~w = ~w', [X, Y]),
         !,
         print_vars5([Y | T], V).
 print_vars5([X], V) :- % last element; constrained variable
@@ -692,7 +696,7 @@ print_vars5([_], V) :- % last element; constrained variable
 print_vars5([X], V) :- % last element; bound variable
         V = val(V2),
         !,
-        writef(', %w = %w', [X, V2]).
+        writef(', ~w = ~w', [X, V2]).
 
 %! get_var_vals(+PrintVars:list, +Vars:compound, -PrintVarsOut:list) is det
 % Get the value for each variable in a list, returning a list of
@@ -786,7 +790,7 @@ format_vars([X | T], [X2 | T2], V) :-
         (L =:= 1 ->
                 atom_chars(Vs, Vc),
                 atom_chars(Vs2, ['?' | Vc])%, % add flag
-                % writef('loop var con list = %w, processed = %w\n', [Con, Con2])
+                % writef('loop var con list = ~w, processed = ~w\n', [Con, Con2])
         ;
                 Vs2 = Vs
         ),
@@ -807,7 +811,7 @@ print_var_constraints([]) :-
 print_var_constraints([X | T]) :-
         X = -(V, Cs),
         sort(Cs, [C | Cs2]), % order and remove duplicate constraints
-        writef('%w \\= %w', [V, C]), % write first entry here for proper comma placement
+        writef('~w \\= ~w', [V, C]), % write first entry here for proper comma placement
         print_var_constraints3(V, Cs2),
         print_var_constraints2(T),
         !.
@@ -832,7 +836,7 @@ print_var_constraints2([]) :-
 % @param Var The variable name.
 % @param Constraints The list of constraints.
 print_var_constraints3(V, [C | T]) :-
-        writef(', %w \\= %w', [V, C]),
+        writef(', ~w \\= ~w', [V, C]),
         !,
         print_var_constraints3(V, T).
 print_var_constraints3(_, []) :-
@@ -856,7 +860,7 @@ indent(0).
 % @param Justification A list of structs of the form -(Goal, Constraints, SubList).
 print_justification(X) :-
         writef('\n\nBEGIN JUSTIFICATION'),
-        %writef('\ngot justification: %w\n\n', [X]), % !!!DEBUG: REMOVE LATER
+        %writef('\ngot justification: ~w\n\n', [X]), % !!!DEBUG: REMOVE LATER
         print_justification(X, 2),
         write('\nEND JUSTIFICATION'), % empty line between solutions.
         !.
@@ -894,7 +898,7 @@ print_justification([X], L) :-
         !,
         write('\n'),
         indent(L),
-        writef('Coinductive success yields %w', [G]),
+        writef('Coinductive success yields ~w', [G]),
         (C\= [] ->
                 write(', ( '),
                 print_var_constraints(C),
@@ -906,7 +910,7 @@ print_justification([X], L) :-
 print_justification([X], L) :-
         X = -(expand__call(G), C, J),
         !,
-        writef(' -> Expand. Unifying with rule head yields %w', [G]),
+        writef(' -> Expand. Unifying with rule head yields ~w', [G]),
         (C\= [] ->
                 write(', ( '),
                 print_var_constraints(C),
@@ -947,9 +951,9 @@ print_abducibles2([X | T], V) :-
         writef('\n\nAbducibles: { '),
         format_predicate(X, X2, Con, [], Uvi, V),
         (X2 = not(X3) -> % print negation properly
-                writef('not %w', [X3])
+                writef('not ~w', [X3])
         ;
-                writef('%w', [X2])
+                writef('~w', [X2])
         ),
         (Con \= [] ->
                 write(' ( '),
@@ -973,9 +977,9 @@ print_abducibles2([], _) :-
 print_abducibles3([X | T], V, Uvi) :-
         format_predicate(X, X2, Con, Uvi, Uvo, V),
         (X2 = not(X3) -> % print negation properly
-                writef(', not %w', [X3])
+                writef(', not ~w', [X3])
         ;
-                writef(', %w', [X2])
+                writef(', ~w', [X2])
         ),
         (Con \= [] ->
                 write(' ( '),
@@ -988,3 +992,97 @@ print_abducibles3([X | T], V, Uvi) :-
         print_abducibles3(T, V, Uvo).
 print_abducibles3([], _, _) :-
         !.
+
+%! print_html(+Justification:list,+File:term) is det
+% Given a justification for a query, write its html code in File.
+%
+% @param Justification A list of structs of the form -(Goal, Constraints, SubList).
+print_html(X,[Q,CHSo,Qv,Vo]) :-
+	writef('\n\nBEGIN HTML JUSTIFICATION'),
+	open_output_file(Stream,Temp),
+	print('<!doctype html>\n <html>\n <head>\n <meta charset="utf-8">\n <title>c(ASP) Justification</title>\n <link href="css/jquery.treemenu.css" rel="stylesheet" type="text/css">\n <link href="css/tree.css" rel="stylesheet" type="text/css">\n \n <link rel="icon" href="logo.ico">\n \n </head>\n \n <body>\n \n'),
+	print('<h3>Query</h3>'),nl,
+	once(print_query(Q)),nl,
+	br,br,nl,
+	once(print_chs(CHSo, Vo, 0)),nl,
+	br,br,nl,
+	print('<font color=blue>'),
+	once(print_vars(Qv,Vo)),
+	print(' ? </font>'),nl,
+	br,br,nl,
+	print('<h3> Justification </h3>\n <ul class="tree">'),nl,
+	print_list(X,2),
+	print('</ul>'),nl,nl,
+	print(' <script src="js/jquery-1.11.2.js"></script>\n <script src="js/jquery.treemenu.js"></script>\n \n <script>\n $(function(){\n        $(".tree").treemenu({delay:100}).openActive();\n    });\n </script>\n \n </body>\n </html>'),
+	close_output_file(Stream,Temp),
+        write('\nEND HTML JUSTIFICATION'), 
+	!.
+
+print_query(Q) :-
+	new_var_struct(V),
+        (
+	    defined_query(Q, _) ->
+	    format_term_list(Q, Q2, _, V),
+	    print('<b><font color=blue>?-</font> '),
+	    print_query_(Q2),
+	    print('</b>')
+	;
+	    true
+	).
+print_query_([X]):-
+	print(X),print('.').
+print_query_([X,Y|Xs]):-
+	print(X),print(', '),
+	print_query_([Y|Xs]).
+
+:- dynamic file/1.
+open_output_file(Stream,Temp) :-
+	current_output(Temp),
+	File = 'html/justification.html',
+	open(File,append,_F),close(_F), %% if File does not exists open it
+	open(File,write,Stream),
+	set_output(Stream).
+close_output_file(Stream,Temp) :-
+	set_output(Temp),
+	close(Stream).
+	
+br :- print('<br>').
+
+print_item([],_) :- !.
+print_item([-(expand__call(Call),C,J)],L) :- !,
+	print(' -> '), print(expand__call(Call)), print_var(C),
+	print_item(J,L).
+print_item([-(chs__success,G,C)],_L) :- !,
+	print(' -> '), print(chs__success),
+	print(' : '), print(G),
+	print(' '), print_var(C).
+print_item(-(A,B,C),L) :- !,
+	print(A), print_var(B),
+	print_item(C,L).
+print_item(X,L) :-
+	!,
+	nl, indent(L),
+	print('  <ul> '),nl,
+	L2 is L + 4,
+	print_list(X,L2),
+	indent(L),
+	print('  </ul>'),nl,indent(L).
+	
+print_list([],_).
+print_list([X|Xs],L) :-
+	indent(L),
+	print('<li> '),
+	print_item(X,L),
+	print('</li>'),nl,
+	print_list(Xs,L).
+
+
+print_var(B) :- !,
+        (
+	    B\= [] ->
+	    print(', ( '),
+	    print(B),
+	    print(' )')
+        ;
+	    true
+        ).

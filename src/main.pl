@@ -42,6 +42,8 @@ results.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+:-set_prolog_flag(multi_arity_warnings,off).
+
 :- use_module(library(lists)).
 :- use_module(common).
 :- use_module(comp_duals).
@@ -74,7 +76,7 @@ submain :-
 %
 % @param Source Path of input file, or list of paths for multiple files.
 main(Sources) :-
-        Sources = [_ | _],
+	Sources = [_ | _],
         !, % list of input files
         main2(Sources).
 main(Source) :-
@@ -122,8 +124,7 @@ main2(Sources) :-
 % @param Sources Paths of input files.
 parse_args(Sources) :-
         current_prolog_flag(argv, Args),
-        Args = [_ | Args2],
-        parse_args2(Args2, Sources).
+        parse_args2(Args, Sources).
 parse_args(_) :-
         write_error('invalid command-line arguments'),
         help,
@@ -188,6 +189,11 @@ parse_args2([X | T], S) :-
         X = '-j',
         !,
         set_user_option(justification, true),
+        parse_args2(T, S).
+parse_args2([X | T], S) :-
+        X = '-w',
+        !,
+        set_user_option(html_justification, true),
         parse_args2(T, S).
 parse_args2([X | T], S) :-
         X = '-n',

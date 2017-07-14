@@ -43,7 +43,8 @@ based, and convinced me that DCGs could produce meaningful error messages.
 */
 
 :- use_module(library(lists)).
-:- use_module(library(writef)).
+%:- use_module(library(writef)).
+:- use_module(ciao_auxiliar).
 :- use_module(common).
 
 %! tokenize(+CharPairs:list, -Tokens:list)
@@ -170,12 +171,12 @@ get_token(_, 1) --> % an error has occurred, try to recover.
 % @param CharsOut Output character list.
 token((X, Pos)) -->
         identifier(Y2, Pos), % match [_]*[a-z][_A-Za-z0-9]+
-        {name(Y, Y2)}, % get atom
+        {c_name(Y, Y2)}, % get atom
         {check_type(Y, X)},
         !.
 token((var(Y), Pos)) -->
         variable(Y2, Pos), % match [A-Z][_A-Za-z0-9]+
-        {name(Y, Y2)}, % get atom
+        {c_name(Y, Y2)}, % get atom
         !.
 token((X, Pos)) -->
         number(X, Pos),
@@ -249,7 +250,7 @@ quoted_string((str(X), Pos)) -->
         !,
         [(Y, _)],
         quoted_string2(X2, Y),
-        {name(X, ['\'', Y | X2])}.
+        {c_name(X, ['\'', Y | X2])}.
 
 %! quoted_string(-String:compound, +LastChar:compound, +CharsIn:list, -CharsOut:list)
 % Get all characters until an un-escaped single quote is encountered.
@@ -353,11 +354,11 @@ number2(float(X), Y) -->
         !, % floating point
         digits(Cs),
         {append(Y, ['.', C | Cs], Cs3)},
-        {name(X, Cs3)}.
+        {c_name(X, Cs3)}.
 number2(int(X), Y) -->
         [], % integer
         !,
-        {name(X, Y)}.
+        {c_name(X, Y)}.
 
 %! digits(-Digits:list, +CharsIn:list, -CharsOut:list)
 % Should only be called from number/4 and number2/4. Get digit characters.
@@ -435,7 +436,7 @@ csyms([], [C | T2], [C | T2]) :-
 % @param Char The character which triggered the error.
 % @param Position The position info for the character.
 lex_error(Char, (Line, Col)) :-
-        swritef(Msg, 'ERROR: %w:%w: Illegal character: \"%w\"\n', [Line, Col, Char]),
+        swritef(Msg, 'ERROR: ~w:~w: Illegal character: \"~w\"\n', [Line, Col, Char]),
         write(user_error, Msg).
 
 %! eof_error
@@ -457,3 +458,8 @@ lex_recover -->
         lex_recover.
 lex_recover -->
         [].
+
+
+
+
+

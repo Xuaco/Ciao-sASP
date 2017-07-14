@@ -121,8 +121,8 @@ option_cleanup :-
 % 64-bit systems, a limit larger than the system allows will be automatically
 % reduced to the maximum allowed size.
 set_stack_sizes :-
-        stack_size(X),
-        set_prolog_stack(global, limit(X)),
-        set_prolog_stack(local, limit(X)),
-        set_prolog_stack(trail, limit(X)),
+        stack_size(_X),
+        % set_prolog_stack(global, limit(X)),
+        % set_prolog_stack(local, limit(X)),
+        % set_prolog_stack(trail, limit(X)),
         !.

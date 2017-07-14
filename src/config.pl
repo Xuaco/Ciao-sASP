@@ -63,6 +63,7 @@ default_option(debug, -1).
 
 % Justification. If true, the proof tree will be printed after each solution.
 default_option(justification, false).
+default_option(html_justification, false).
 
 % Abducibles. If true, print a separate list of abducibles with each CHS. If no
 % abducibles have succeeded, output will be unaffected.

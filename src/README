@@ -1,29 +1,95 @@
-s(ASP) Internal Documentation {#mainpage}
-=========================================
+c(ASP) Internal Documentation
+=============================
 
 Introduction
 ------------
-This documentation provides an overview of the internals of the s(ASP)
-system. This document is intended for those wishing to understand or edit
-s(ASP)'s code. Users of s(ASP) should consult the README file located in
-the root directory of the distribution. We apologize for the confusion,
-but as of this writing, PlDoc requires that this file use the same name.
 
-Generating Documentation
-------------------------
+c(ASP) is the CIAO ported version of s(ASP), s(ASP) is an
+implementation of the stable model semantics of logic
+programming. Unlike similar systems, it does not employ any form of
+grounding. This allows s(ASP) to execute programs that are not
+finitely groundable, including those which make use of lists and
+terms. Work on s(ASP) is supported by the National Science Foundation
+under Grant No. 1423419 visit
+https://sourceforge.net/projects/sasp-system/ for the s(ASP) source
+code.
 
-The s(ASP) system's internal documentation is designed for use with
-[PlDoc](http://www.swi-prolog.org/pldoc/package/pldoc.html). The included
-doc_gen.pl can be used to generate documentation for the s(ASP) system and open
-it in a web browser.
+Instalation of c(ASP)
+---------------------
 
-Modifying the Code
-------------------
+To run c(ASP) you need CIAO Prolog working in your computer:
+visit http://ciao-lang.org/ for the last CIAO stable version.
 
-When editing to or adding s(ASP)'s code, use PlDoc-compatible comments to
-ensure that the automatic documentation generation remains functional. For help
-with properly documenting the code, refer to the
-[PlDoc Manual](http://www.swi-prolog.org/pldoc/package/pldoc.html). For
-additional help with Markdown syntax as used in this file, refer to the
-[doxygen User Manual](http://www.doxygen.org/manual.html). Note that not all
-doxygen features are supported by PlDoc.
+Then compile the c(ASP) source code using:
+
+ciaoc -x -o casp main.pl
+
+it generates an executable file named casp which you can place
+wherever you want...
+
+Execution of c(ASP)
+-------------------
+
+To obtain one model of the program (i.e. test.pl)
+   $ ./casp test.pl
+   Answer: 1
+   { q(?Var6), not p(?Var6) }
+   $
+
+To obtain all the models (answers) of test.pl
+   $ ./casp -s0 test.pl
+
+To obtain 5 answers of test.pl
+   $ ./casp -s5 test.pl
+
+To print the "translation" of the code (with duals predicates and
+check-rules)
+   $ ./casp -d0 test.pl
+
+To use casp with its iterative mode:
+   $ ./casp -i test.pl
+   ?- p(X).
+   { p(?Var6), not q(?Var6) } ? 
+
+   false.
+   ?- q(X).
+   { q(?Var6), not p(?Var6) } ? ;
+
+   false.
+   ?- halt.
+   $
+
+The example program test.pl is:
+   p(X) :- not q(X).
+   q(X) :- not p(X).
+
+   ?- q(X).
+
+Note that the program include the query in order to be use without
+iterative mode...
+
+
+Generation of the HTML justification tree
+-----------------------------------------
+
+To generate the html justification tree the execution should be made
+from the src directory:
+   $ ./casp -w test.pl
+   Answer: 1
+   { q(?Var6), not p(?Var6) }
+
+   BEGIN HTML JUSTIFICATION
+   END HTML JUSTIFICATION
+   $
+
+the justification tree is a file named justification.html place in the
+sub-directory html/ where there are the css/ and js/ directories needed
+by the justification.html file.
+
+In order to generate the justification of each answers use the
+iterative mode and refresh the justification.html file in the browser:
+   $ ./casp -w -i test.pl
+   ?- ...
+
+
+
