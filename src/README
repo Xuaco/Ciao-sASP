@@ -1,0 +1,29 @@
+s(ASP) Internal Documentation {#mainpage}
+=========================================
+
+Introduction
+------------
+This documentation provides an overview of the internals of the s(ASP)
+system. This document is intended for those wishing to understand or edit
+s(ASP)'s code. Users of s(ASP) should consult the README file located in
+the root directory of the distribution. We apologize for the confusion,
+but as of this writing, PlDoc requires that this file use the same name.
+
+Generating Documentation
+------------------------
+
+The s(ASP) system's internal documentation is designed for use with
+[PlDoc](http://www.swi-prolog.org/pldoc/package/pldoc.html). The included
+doc_gen.pl can be used to generate documentation for the s(ASP) system and open
+it in a web browser.
+
+Modifying the Code
+------------------
+
+When editing to or adding s(ASP)'s code, use PlDoc-compatible comments to
+ensure that the automatic documentation generation remains functional. For help
+with properly documenting the code, refer to the
+[PlDoc Manual](http://www.swi-prolog.org/pldoc/package/pldoc.html). For
+additional help with Markdown syntax as used in this file, refer to the
+[doxygen User Manual](http://www.doxygen.org/manual.html). Note that not all
+doxygen features are supported by PlDoc.
