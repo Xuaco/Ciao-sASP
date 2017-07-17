@@ -1000,7 +1000,7 @@ print_abducibles3([], _, _) :-
 print_html(X,[Q,CHSo,Qv,Vo]) :-
 	writef('\n\nBEGIN HTML JUSTIFICATION'),
 	open_output_file(Stream,Temp),
-	print('<!doctype html>\n <html>\n <head>\n <meta charset="utf-8">\n <title>c(ASP) Justification</title>\n <link href="css/jquery.treemenu.css" rel="stylesheet" type="text/css">\n <link href="css/tree.css" rel="stylesheet" type="text/css">\n \n <link rel="icon" href="logo.ico">\n \n </head>\n \n <body>\n \n'),
+	print('<!doctype html>\n <html>\n <head>\n <meta charset="utf-8">\n <title>c(ASP) Justification</title>\n <link href="css/jquery.treemenu.css" rel="stylesheet" type="text/css">\n <link href="css/tree.css" rel="stylesheet" type="text/css">\n \n <link rel="icon" href="logo.ico">\n \n </head>\n \n <body style="font-size:15px;background: #ECECEC; margin:80px; color:#333;">\n \n'),
 	print('<h3>Query</h3>'),nl,
 	once(print_query(Q)),nl,
 	br,br,nl,

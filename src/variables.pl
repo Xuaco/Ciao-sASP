@@ -665,7 +665,6 @@ get_unique_vars3(Gi, Go, Vsi, Vso, Vi, Vo) :-
         !,
         generate_unique_var(Go, Vsi, Vso, Gi),
         Vo = [-(Gi, Go) | Vi],
-	display(gen(Gi,Go,Vi)),nl,
         !.
 get_unique_vars3(Gi, Go, Vsi, Vso, Vi, Vo) :-
         Gi =.. [F | A], % compound term, process args

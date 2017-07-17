@@ -10,18 +10,30 @@
  
  </head>
  
- <body>
+ <body style="font-size:15px;background: #ECECEC; margin:80px; color:#333;">
  
 <h3>Query</h3>
-<b><font color=blue>?-</font> not(_false).</b>
+<b><font color=blue>?-</font> p(1).</b>
 <br><br>
-{ }
+{ p(1), not q(1) }
 <br><br>
 
 <br><br>
 <h3> Justification </h3>
  <ul class="tree">
-  <li> not(_false) 	<font color=green size=-1> &emsp;  not(_false) :- true.</font></li>
+  <li> p(1) 	<font color=green size=-1> &emsp;  p(X<sub>0&nbsp;</sub>) :- not(q(X<sub>0&nbsp;</sub>)).</font>
+    <ul> 
+      <li> not(q(1)) 	<font color=green size=-1> &emsp;  not(q(_V<sub>1&nbsp;</sub>)) :- not(_q1(_V<sub>1&nbsp;</sub>)).</font>
+        <ul> 
+          <li> not(_q1(1)) 	<font color=green size=-1> &emsp;  not(_q1(X<sub>2&nbsp;</sub>)) :- p(X<sub>2&nbsp;</sub>).</font>
+            <ul> 
+              <li> p(1) <font color=green> &emsp; &#10003; </font>  </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
   <li> _nmr_check 	<font color=green size=-1> &emsp;  _nmr_check :- true.</font></li>
 </ul>
 
