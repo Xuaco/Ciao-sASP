@@ -246,7 +246,7 @@ read_file2(_, Char, []) :-
         Char = end_of_file,
         !.
 read_file2(Input, Char, [Char | Chars]) :-
-        get_char(Input, Char2),
+        catch(get_char(Input, Char2),_,Chars=[]),
         read_file2(Input, Char2, Chars).
 
 %! read_query(+Input:stream, -CharsOut:list) is det
