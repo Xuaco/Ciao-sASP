@@ -14,16 +14,16 @@ under Grant No. 1423419 visit
 https://sourceforge.net/projects/sasp-system/ for the s(ASP) source
 code.
 
-Installation of c(ASP) - Only tested in Mac-OS
-======================---------------------
+Installation of c(ASP) 
+======================
 
 To run c(ASP) you need CIAO Prolog working in your computer:
 visit http://ciao-lang.org/ for the last CIAO stable version.
 
 Then compile the c(ASP) source code using:
 
-For Mac-OS
-----------
+For Mac-OS / Linux
+------------------
 
 ciaoc -x -o casp main.pl
 
@@ -35,8 +35,8 @@ For Windows
 
 ciaoc-1.14 -o casp main.pl
 
-it generates an executable file named casp which it is recommended to
-be executed from src\
+it generates an executable file named casp (it is recommended to
+execute it from src\).
 
 
 Usage of c(ASP)
@@ -105,30 +105,31 @@ iterative mode and refresh the justification.html file in the browser:
 
 
 
-Use of the HTML local_interface
-===============================
+Installation / Usage of the HTML local_interface
+================================================
 
-c(ASP) provide a tool called 'web_casp' which run a html/php
+c(ASP) provide a tool called 'web_casp{sh,bat}' which run a html/php
 local_interface allowing the execution of c(ASP) programs with user
-queries and provide the results in a html file showing the HTML
-justification tree
+queries and generate a file with the HTML justification tree.
 
-The execution in MAC-OS:
-------------------------
+For Mac-OS / Linux
+------------------
 
-Last version of MAC-OS include php therefore using the shell script in src/:
+Last versions of OSX and Linux include php. Therefore using the shell
+script in src/:
 
      $ ./web_casp.sh
 
-Php create a localhost and the web interface is opened in the browser.
+and php will create the localhost and the HTML local_interface will be
+opened in the default browser (firefox for Linux).
 
-The execution in Windows:
--------------------------
+For Windows
+-----------
 
-The current sources has been tested using XAMPP
-<https://www.apachefriends.org/es/index.html>.
-
-Assuming the installation of XAMPP in C:\xampp:
+In Windows we have to install a mini web server. The sources of casp
+has been tested using XAMPP (assuming it is installed in
+C:\xampp). See <https://www.apachefriends.org/es/index.html> for
+download and installation instructions. The next steps are:
 
 First: The source code of c(ASP) has to be copied to
 C:\xampp\htdocs\ciao-master\src.
@@ -143,4 +144,4 @@ Finally: Execute the bat script in src\:
 
      $ web_casp.bat
 
-The web interface will be opened in the localhost server.
+and the HTML local_interface will be opened in the default browser.

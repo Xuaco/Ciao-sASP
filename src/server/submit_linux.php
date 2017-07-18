@@ -24,14 +24,6 @@
     }
     exit;
   }
-
-    system('echo ^<htlm^> Program: ^<b^>' . $_FILES["program"]["name"] . '^</b^>^<br /^> false ^</html^> > html\justification.html');
-
-system('echo  ' . $_POST["query"] . ' > query | ..\casp   -w ' . $_FILES["program"]["tmp_name"] . ' query' );
-      
-      ?>
-  </body>
-</html>
       
     system('echo \'<htlm> Program: <b>' . $_FILES["program"]["name"] . '</b><br /> false </html>\' > html/justification.html');
 
