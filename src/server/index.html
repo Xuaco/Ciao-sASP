@@ -47,16 +47,17 @@
   
   <body>
 
+
     <br>
 
     <center>
       <div>
 	<table width="100%">
-	  <tr><td  width="40%" valign="top">
+	  <tr><td width="40%" valign="top">
 	      <center>
 		<table>
 		  <!-- <form target="_blank" action="submit.php" method="post" enctype="multipart/form-data" onsubmit="window.open(this.href,this.target,'width=1000,height=400,top=100,left=100,toolbar=no,location=no,status=no,menubar=no');return true;"> -->
-		  <form target="_blank" action="submit.php" method="post" enctype="multipart/form-data" >
+		  <form  id="form1" target="_blank"  method="post" enctype="multipart/form-data" >
 		    <tr> <td width="75px">
 			Program: <br /><br />
 		      </td><td>
@@ -100,7 +101,7 @@
 	</td></tr></table>
       </div>
       
-      
+
       <script type="text/javascript">
 	function readSingleFile(evt) {
 	
@@ -111,14 +112,15 @@
 	r.onload = function(e) { 
 	var contents = e.target.result;
 	contents = contents.replace(
-	/(%.*?\n)|(\b[A-Z][A-Za-z0-9]*\b)|("[^"]*"|'[^']*')|(^[a-z\-][A-Za-z0-9_]*)|(^:-.*?\.)|(:-)/gm,
-	function(k,a,b,c,d,e,f) {
-	if (a) return "<font color=darkred>" + a + "</font>"; <!-- %% comments -->
-	if (b) return "<font color=brown>" + b + "</font>";     <!-- variables -->
-	if (c) return "<font color=gray>" + c + "</font>";  <!-- "' '" -->
-	if (d) return "<font color=dodgerblue>" + d + "</font>"; <!-- function -->
-	if (e) return "<font color=darkblue>" + e + "</font>";   <!-- :- -->
-	if (f) return "<font color=darkorange>" + f + "</font>";   <!-- :- -->
+	/(%.*?\n)|(\b[A-Z][A-Za-z0-9]*\b)|("[^"]*"|'[^']*')|(^[a-z\-_][A-Za-z0-9_]*)|(^:-.*?\.)|(:-)|(\?\-)/gm,
+	function(FOUND,a,b,c,d,e,f,g) {
+	if (a) return "<font color=darkred>" + a + "</font>";          <!-- %% comments -->
+	if (b) return "<font color=brown>" + b + "</font>";            <!-- variables -->
+	if (c) return "<font color=gray>" + c + "</font>";             <!-- "' '" -->
+	if (d) return "<font color=dodgerblue>" + d + "</font>";       <!-- function -->
+	if (e) return "<font color=darkblue>" + e + "</font>";         <!-- :- [...]. -->
+	if (f) return "<font color=darkorange>" + f + "</font>";       <!-- :- -->
+	if (g) return "<font color=darkblue><b>" + g + "</b></font>";  <!-- ?- -->
 	}
 	);
 	document.getElementById('area').innerHTML=  contents;
@@ -133,8 +135,16 @@
 	
 	document.getElementById('program').addEventListener('change', readSingleFile, false);
       </script>
-      
-      
+        
+      <script type="text/javascript">
+      	if (window.navigator.userAgent.indexOf("Mac")            != -1)
+      	document.getElementById('form1').action ="submit_mac.php";
+      	else if  (window.navigator.userAgent.indexOf("Linux")            != -1)
+      	document.getElementById('form1').action ="submit_linux.php";
+      	else
+      	document.getElementById('form1').action ="submit_windows.php";
+      </script>
+    
       
   </body>
 </html

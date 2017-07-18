@@ -13,21 +13,145 @@
  <body style="font-size:15px;background: #ECECEC; margin:80px; color:#333;">
  
 <h3>Query</h3>
-<b><font color=blue>?-</font> p(1).</b>
+<b><font color=blue>?-</font> hanoi(3,T).</b>
 <br><br>
-{ p(1), not q(1) }
+{ hanoi(3,7), move(1,1,2), move(2,1,3), move(3,2,3), move(4,1,2), move(5,3,1), move(6,3,2), move(7,1,2), moven(1,0,1,1,2,3), moven(1,2,3,2,3,1), moven(1,4,5,3,1,2), moven(1,6,7,1,2,3), moven(2,0,3,1,3,2), moven(2,4,7,3,2,1), moven(3,0,7,1,2,3), not negmove(1,1,2), not negmove(2,1,3), not negmove(3,2,3), not negmove(4,1,2), not negmove(5,3,1), not negmove(6,3,2), not negmove(7,1,2) }
 <br><br>
-
+<font color=blue>
+T = 7 ? </font>
 <br><br>
 <h3> Justification </h3>
  <ul class="tree">
-  <li> p(1) 	<font color=green size=-1> &emsp;  p(X<sub>0&nbsp;</sub>) :- not(q(X<sub>0&nbsp;</sub>)).</font>
+  <li> hanoi(3,T) 	<font color=green size=-1> &emsp;  hanoi(N<sub>1&nbsp;</sub>,T<sub>2&nbsp;</sub>) :- moven(N<sub>1&nbsp;</sub>,0,T<sub>2&nbsp;</sub>,1,2,3).</font>
     <ul> 
-      <li> not(q(1)) 	<font color=green size=-1> &emsp;  not(q(_V<sub>1&nbsp;</sub>)) :- not(_q1(_V<sub>1&nbsp;</sub>)).</font>
+      <li> moven(3,0,T<sub>2&nbsp;</sub>,1,2,3) 	<font color=green size=-1> &emsp;  moven(N<sub>4&nbsp;</sub>,Ti<sub>5&nbsp;</sub>,To<sub>6&nbsp;</sub>,A<sub>7&nbsp;</sub>,B<sub>8&nbsp;</sub>,C<sub>9&nbsp;</sub>) :- N<sub>4&nbsp;</sub>>1, &nbsp; &nbsp;N1<sub>10&nbsp;</sub> is N<sub>4&nbsp;</sub>-1, &nbsp; &nbsp;moven(N1<sub>10&nbsp;</sub>,Ti<sub>5&nbsp;</sub>,T2<sub>11&nbsp;</sub>,A<sub>7&nbsp;</sub>,C<sub>9&nbsp;</sub>,B<sub>8&nbsp;</sub>), &nbsp; &nbsp;T3<sub>12&nbsp;</sub> is T2<sub>11&nbsp;</sub>+1, &nbsp; &nbsp;move(T3<sub>12&nbsp;</sub>,A<sub>7&nbsp;</sub>,B<sub>8&nbsp;</sub>), &nbsp; &nbsp;moven(N1<sub>10&nbsp;</sub>,T3<sub>12&nbsp;</sub>,To<sub>6&nbsp;</sub>,C<sub>9&nbsp;</sub>,B<sub>8&nbsp;</sub>,A<sub>7&nbsp;</sub>).</font>
         <ul> 
-          <li> not(_q1(1)) 	<font color=green size=-1> &emsp;  not(_q1(X<sub>2&nbsp;</sub>)) :- p(X<sub>2&nbsp;</sub>).</font>
+          <li> 3>1</li>
+          <li> N1<sub>10&nbsp;</sub> is 3-1</li>
+          <li> moven(2,0,T2<sub>11&nbsp;</sub>,1,3,2) 	<font color=green size=-1> &emsp;  moven(N<sub>14&nbsp;</sub>,Ti<sub>15&nbsp;</sub>,To<sub>16&nbsp;</sub>,A<sub>17&nbsp;</sub>,B<sub>18&nbsp;</sub>,C<sub>19&nbsp;</sub>) :- N<sub>14&nbsp;</sub>>1, &nbsp; &nbsp;N1<sub>20&nbsp;</sub> is N<sub>14&nbsp;</sub>-1, &nbsp; &nbsp;moven(N1<sub>20&nbsp;</sub>,Ti<sub>15&nbsp;</sub>,T2<sub>21&nbsp;</sub>,A<sub>17&nbsp;</sub>,C<sub>19&nbsp;</sub>,B<sub>18&nbsp;</sub>), &nbsp; &nbsp;T3<sub>22&nbsp;</sub> is T2<sub>21&nbsp;</sub>+1, &nbsp; &nbsp;move(T3<sub>22&nbsp;</sub>,A<sub>17&nbsp;</sub>,B<sub>18&nbsp;</sub>), &nbsp; &nbsp;moven(N1<sub>20&nbsp;</sub>,T3<sub>22&nbsp;</sub>,To<sub>16&nbsp;</sub>,C<sub>19&nbsp;</sub>,B<sub>18&nbsp;</sub>,A<sub>17&nbsp;</sub>).</font>
             <ul> 
-              <li> p(1) <font color=green> &emsp; &#10003; </font>  </li>
+              <li> 2>1</li>
+              <li> N1<sub>20&nbsp;</sub> is 2-1</li>
+              <li> moven(1,0,T2<sub>21&nbsp;</sub>,1,2,3) 	<font color=green size=-1> &emsp;  moven(1,Ti<sub>24&nbsp;</sub>,To<sub>25&nbsp;</sub>,A<sub>26&nbsp;</sub>,B<sub>27&nbsp;</sub>,_V<sub>28&nbsp;</sub>) :- To<sub>25&nbsp;</sub> is Ti<sub>24&nbsp;</sub>+1, &nbsp; &nbsp;move(To<sub>25&nbsp;</sub>,A<sub>26&nbsp;</sub>,B<sub>27&nbsp;</sub>).</font>
+                <ul> 
+                  <li> To<sub>25&nbsp;</sub> is 0+1</li>
+                  <li> move(1,1,2) 	<font color=green size=-1> &emsp;  move(T<sub>29&nbsp;</sub>,P1<sub>30&nbsp;</sub>,P2<sub>31&nbsp;</sub>) :- not(negmove(T<sub>29&nbsp;</sub>,P1<sub>30&nbsp;</sub>,P2<sub>31&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(negmove(1,1,2)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>32&nbsp;</sub>,_V<sub>33&nbsp;</sub>,_V<sub>34&nbsp;</sub>)) :- not(_negmove1(_V<sub>32&nbsp;</sub>,_V<sub>33&nbsp;</sub>,_V<sub>34&nbsp;</sub>)).</font>
+                        <ul> 
+                          <li> not(_negmove1(1,1,2)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>35&nbsp;</sub>,P1<sub>36&nbsp;</sub>,P2<sub>37&nbsp;</sub>)) :- move(T<sub>35&nbsp;</sub>,P1<sub>36&nbsp;</sub>,P2<sub>37&nbsp;</sub>).</font>
+                            <ul> 
+                              <li> move(1,1,2) <font color=green> &emsp; &#10003; </font>  </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li> T3<sub>22&nbsp;</sub> is 1+1</li>
+              <li> move(2,1,3) 	<font color=green size=-1> &emsp;  move(T<sub>38&nbsp;</sub>,P1<sub>39&nbsp;</sub>,P2<sub>40&nbsp;</sub>) :- not(negmove(T<sub>38&nbsp;</sub>,P1<sub>39&nbsp;</sub>,P2<sub>40&nbsp;</sub>)).</font>
+                <ul> 
+                  <li> not(negmove(2,1,3)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>41&nbsp;</sub>,_V<sub>42&nbsp;</sub>,_V<sub>43&nbsp;</sub>)) :- not(_negmove1(_V<sub>41&nbsp;</sub>,_V<sub>42&nbsp;</sub>,_V<sub>43&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(_negmove1(2,1,3)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>44&nbsp;</sub>,P1<sub>45&nbsp;</sub>,P2<sub>46&nbsp;</sub>)) :- move(T<sub>44&nbsp;</sub>,P1<sub>45&nbsp;</sub>,P2<sub>46&nbsp;</sub>).</font>
+                        <ul> 
+                          <li> move(2,1,3) <font color=green> &emsp; &#10003; </font>  </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li> moven(1,2,To<sub>16&nbsp;</sub>,2,3,1) 	<font color=green size=-1> &emsp;  moven(1,Ti<sub>48&nbsp;</sub>,To<sub>49&nbsp;</sub>,A<sub>50&nbsp;</sub>,B<sub>51&nbsp;</sub>,_V<sub>52&nbsp;</sub>) :- To<sub>49&nbsp;</sub> is Ti<sub>48&nbsp;</sub>+1, &nbsp; &nbsp;move(To<sub>49&nbsp;</sub>,A<sub>50&nbsp;</sub>,B<sub>51&nbsp;</sub>).</font>
+                <ul> 
+                  <li> To<sub>49&nbsp;</sub> is 2+1</li>
+                  <li> move(3,2,3) 	<font color=green size=-1> &emsp;  move(T<sub>53&nbsp;</sub>,P1<sub>54&nbsp;</sub>,P2<sub>55&nbsp;</sub>) :- not(negmove(T<sub>53&nbsp;</sub>,P1<sub>54&nbsp;</sub>,P2<sub>55&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(negmove(3,2,3)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>56&nbsp;</sub>,_V<sub>57&nbsp;</sub>,_V<sub>58&nbsp;</sub>)) :- not(_negmove1(_V<sub>56&nbsp;</sub>,_V<sub>57&nbsp;</sub>,_V<sub>58&nbsp;</sub>)).</font>
+                        <ul> 
+                          <li> not(_negmove1(3,2,3)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>59&nbsp;</sub>,P1<sub>60&nbsp;</sub>,P2<sub>61&nbsp;</sub>)) :- move(T<sub>59&nbsp;</sub>,P1<sub>60&nbsp;</sub>,P2<sub>61&nbsp;</sub>).</font>
+                            <ul> 
+                              <li> move(3,2,3) <font color=green> &emsp; &#10003; </font>  </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li> T3<sub>12&nbsp;</sub> is 3+1</li>
+          <li> move(4,1,2) 	<font color=green size=-1> &emsp;  move(T<sub>62&nbsp;</sub>,P1<sub>63&nbsp;</sub>,P2<sub>64&nbsp;</sub>) :- not(negmove(T<sub>62&nbsp;</sub>,P1<sub>63&nbsp;</sub>,P2<sub>64&nbsp;</sub>)).</font>
+            <ul> 
+              <li> not(negmove(4,1,2)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>65&nbsp;</sub>,_V<sub>66&nbsp;</sub>,_V<sub>67&nbsp;</sub>)) :- not(_negmove1(_V<sub>65&nbsp;</sub>,_V<sub>66&nbsp;</sub>,_V<sub>67&nbsp;</sub>)).</font>
+                <ul> 
+                  <li> not(_negmove1(4,1,2)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>68&nbsp;</sub>,P1<sub>69&nbsp;</sub>,P2<sub>70&nbsp;</sub>)) :- move(T<sub>68&nbsp;</sub>,P1<sub>69&nbsp;</sub>,P2<sub>70&nbsp;</sub>).</font>
+                    <ul> 
+                      <li> move(4,1,2) <font color=green> &emsp; &#10003; </font>  </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li> moven(2,4,To<sub>6&nbsp;</sub>,3,2,1) 	<font color=green size=-1> &emsp;  moven(N<sub>72&nbsp;</sub>,Ti<sub>73&nbsp;</sub>,To<sub>74&nbsp;</sub>,A<sub>75&nbsp;</sub>,B<sub>76&nbsp;</sub>,C<sub>77&nbsp;</sub>) :- N<sub>72&nbsp;</sub>>1, &nbsp; &nbsp;N1<sub>78&nbsp;</sub> is N<sub>72&nbsp;</sub>-1, &nbsp; &nbsp;moven(N1<sub>78&nbsp;</sub>,Ti<sub>73&nbsp;</sub>,T2<sub>79&nbsp;</sub>,A<sub>75&nbsp;</sub>,C<sub>77&nbsp;</sub>,B<sub>76&nbsp;</sub>), &nbsp; &nbsp;T3<sub>80&nbsp;</sub> is T2<sub>79&nbsp;</sub>+1, &nbsp; &nbsp;move(T3<sub>80&nbsp;</sub>,A<sub>75&nbsp;</sub>,B<sub>76&nbsp;</sub>), &nbsp; &nbsp;moven(N1<sub>78&nbsp;</sub>,T3<sub>80&nbsp;</sub>,To<sub>74&nbsp;</sub>,C<sub>77&nbsp;</sub>,B<sub>76&nbsp;</sub>,A<sub>75&nbsp;</sub>).</font>
+            <ul> 
+              <li> 2>1</li>
+              <li> N1<sub>78&nbsp;</sub> is 2-1</li>
+              <li> moven(1,4,T2<sub>79&nbsp;</sub>,3,1,2) 	<font color=green size=-1> &emsp;  moven(1,Ti<sub>82&nbsp;</sub>,To<sub>83&nbsp;</sub>,A<sub>84&nbsp;</sub>,B<sub>85&nbsp;</sub>,_V<sub>86&nbsp;</sub>) :- To<sub>83&nbsp;</sub> is Ti<sub>82&nbsp;</sub>+1, &nbsp; &nbsp;move(To<sub>83&nbsp;</sub>,A<sub>84&nbsp;</sub>,B<sub>85&nbsp;</sub>).</font>
+                <ul> 
+                  <li> To<sub>83&nbsp;</sub> is 4+1</li>
+                  <li> move(5,3,1) 	<font color=green size=-1> &emsp;  move(T<sub>87&nbsp;</sub>,P1<sub>88&nbsp;</sub>,P2<sub>89&nbsp;</sub>) :- not(negmove(T<sub>87&nbsp;</sub>,P1<sub>88&nbsp;</sub>,P2<sub>89&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(negmove(5,3,1)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>90&nbsp;</sub>,_V<sub>91&nbsp;</sub>,_V<sub>92&nbsp;</sub>)) :- not(_negmove1(_V<sub>90&nbsp;</sub>,_V<sub>91&nbsp;</sub>,_V<sub>92&nbsp;</sub>)).</font>
+                        <ul> 
+                          <li> not(_negmove1(5,3,1)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>93&nbsp;</sub>,P1<sub>94&nbsp;</sub>,P2<sub>95&nbsp;</sub>)) :- move(T<sub>93&nbsp;</sub>,P1<sub>94&nbsp;</sub>,P2<sub>95&nbsp;</sub>).</font>
+                            <ul> 
+                              <li> move(5,3,1) <font color=green> &emsp; &#10003; </font>  </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li> T3<sub>80&nbsp;</sub> is 5+1</li>
+              <li> move(6,3,2) 	<font color=green size=-1> &emsp;  move(T<sub>96&nbsp;</sub>,P1<sub>97&nbsp;</sub>,P2<sub>98&nbsp;</sub>) :- not(negmove(T<sub>96&nbsp;</sub>,P1<sub>97&nbsp;</sub>,P2<sub>98&nbsp;</sub>)).</font>
+                <ul> 
+                  <li> not(negmove(6,3,2)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>99&nbsp;</sub>,_V<sub>100&nbsp;</sub>,_V<sub>101&nbsp;</sub>)) :- not(_negmove1(_V<sub>99&nbsp;</sub>,_V<sub>100&nbsp;</sub>,_V<sub>101&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(_negmove1(6,3,2)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>102&nbsp;</sub>,P1<sub>103&nbsp;</sub>,P2<sub>104&nbsp;</sub>)) :- move(T<sub>102&nbsp;</sub>,P1<sub>103&nbsp;</sub>,P2<sub>104&nbsp;</sub>).</font>
+                        <ul> 
+                          <li> move(6,3,2) <font color=green> &emsp; &#10003; </font>  </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li> moven(1,6,To<sub>74&nbsp;</sub>,1,2,3) 	<font color=green size=-1> &emsp;  moven(1,Ti<sub>106&nbsp;</sub>,To<sub>107&nbsp;</sub>,A<sub>108&nbsp;</sub>,B<sub>109&nbsp;</sub>,_V<sub>110&nbsp;</sub>) :- To<sub>107&nbsp;</sub> is Ti<sub>106&nbsp;</sub>+1, &nbsp; &nbsp;move(To<sub>107&nbsp;</sub>,A<sub>108&nbsp;</sub>,B<sub>109&nbsp;</sub>).</font>
+                <ul> 
+                  <li> To<sub>107&nbsp;</sub> is 6+1</li>
+                  <li> move(7,1,2) 	<font color=green size=-1> &emsp;  move(T<sub>111&nbsp;</sub>,P1<sub>112&nbsp;</sub>,P2<sub>113&nbsp;</sub>) :- not(negmove(T<sub>111&nbsp;</sub>,P1<sub>112&nbsp;</sub>,P2<sub>113&nbsp;</sub>)).</font>
+                    <ul> 
+                      <li> not(negmove(7,1,2)) 	<font color=green size=-1> &emsp;  not(negmove(_V<sub>114&nbsp;</sub>,_V<sub>115&nbsp;</sub>,_V<sub>116&nbsp;</sub>)) :- not(_negmove1(_V<sub>114&nbsp;</sub>,_V<sub>115&nbsp;</sub>,_V<sub>116&nbsp;</sub>)).</font>
+                        <ul> 
+                          <li> not(_negmove1(7,1,2)) 	<font color=green size=-1> &emsp;  not(_negmove1(T<sub>117&nbsp;</sub>,P1<sub>118&nbsp;</sub>,P2<sub>119&nbsp;</sub>)) :- move(T<sub>117&nbsp;</sub>,P1<sub>118&nbsp;</sub>,P2<sub>119&nbsp;</sub>).</font>
+                            <ul> 
+                              <li> move(7,1,2) <font color=green> &emsp; &#10003; </font>  </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
         </ul>

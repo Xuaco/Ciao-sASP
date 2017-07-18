@@ -1,8 +1,8 @@
 c(ASP) Internal Documentation
-=============================
++++++++++++++++++++++++++++++
 
 Introduction
-------------
+============
 
 c(ASP) is the CIAO ported version of s(ASP), s(ASP) is an
 implementation of the stable model semantics of logic
@@ -15,20 +15,32 @@ https://sourceforge.net/projects/sasp-system/ for the s(ASP) source
 code.
 
 Installation of c(ASP) - Only tested in Mac-OS
----------------------
+======================---------------------
 
 To run c(ASP) you need CIAO Prolog working in your computer:
 visit http://ciao-lang.org/ for the last CIAO stable version.
 
 Then compile the c(ASP) source code using:
 
+For Mac-OS
+----------
+
 ciaoc -x -o casp main.pl
 
 it generates an executable file named casp which you can place
 wherever you want...
 
-Execution of c(ASP)
--------------------
+For Windows
+-----------
+
+ciaoc-1.14 -o casp main.pl
+
+it generates an executable file named casp which it is recommended to
+be executed from src\
+
+
+Usage of c(ASP)
+===============
 
 To obtain one model of the program (i.e. test.pl)
    $ ./casp test.pl
@@ -93,35 +105,42 @@ iterative mode and refresh the justification.html file in the browser:
 
 
 
-Use of a browser local_interface
---------------------------------
+Use of the HTML local_interface
+===============================
 
 c(ASP) provide a tool called 'web_casp' which run a html/php
 local_interface allowing the execution of c(ASP) programs with user
 queries and provide the results in a html file showing the HTML
 justification tree
 
-The installation is similar to casp:
+The execution in MAC-OS:
+------------------------
 
-    $ ciaoc -x -o web_casp web_casp.pl
+Last version of MAC-OS include php therefore using the shell script in src/:
 
-And it execution is simpler:
+     $ ./web_casp.sh
 
-    $ ./web_casp
+Php create a localhost and the web interface is opened in the browser.
 
-It run php to create a localhost server and then open the index file
-located in the directory 'src/server/'.
+The execution in Windows:
+-------------------------
 
-'Index.html' provides a form where we specify the location of a
-c(ASP) program (using reference path from 'src/server/') and a query
-(if the query field is empty the program execute the query specify in
-the c(ASP) program.
+The current sources has been tested using XAMPP
+<https://www.apachefriends.org/es/index.html>.
 
-As an example:
-   Program:   ../../test/hanoi.pl
-   Query:     ?- hanoi(4,Y).
+Assuming the installation of XAMPP in C:\xampp:
 
-Pressing the button 'Submit' c(ASP) evaluate the program
-'../../test/hanoi.pl' and the query '?- hanoi(4,Y) and present the results
-in the next page ('html/justification') with its justification.
+First: The source code of c(ASP) has to be copied to
+C:\xampp\htdocs\ciao-master\src.
 
+Second: The compiled file of casp should be copied in
+C:\xampp\htdocs\ciao-master\src\server\
+
+Third: Run the application 'XAMPP Control Panel' and start the Apache
+engine.
+
+Finally: Execute the bat script in src\:
+
+     $ web_casp.bat
+
+The web interface will be opened in the localhost server.

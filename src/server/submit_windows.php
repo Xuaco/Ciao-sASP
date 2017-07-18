@@ -25,18 +25,19 @@
     exit;
   }
 
+    system('echo ^<htlm^> Program: ^<b^>' . $_FILES["program"]["name"] . '^</b^>^<br /^> false ^</html^> > html\justification.html');
 
+echo "<div style='white-space: pre-wrap'>";
+
+system('echo: ' . $_POST["query"] . ' > query | ..\casp   -w ' . $_FILES["program"]["tmp_name"] . ' query' );
       
-    system('echo \'<htlm> Program: <b>' . $_FILES["program"]["name"] . '</b><br /> false </html>\' > html/justification.html');
+echo "</div>";
 
-
-system('echo \' ' . $_POST["query"] . '\' > query | ./../casp   -w ' . $_FILES["program"]["tmp_name"] . ' query' );
-      
-echo '<script>window.location.href = "html/justification.html";</script>';
-
-
+system('start html\justification.html');
 
       ?>
 
+
   </body>
 </html>
+
