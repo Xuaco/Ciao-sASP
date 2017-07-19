@@ -64,17 +64,8 @@ directories:
 4. Installation
 ---------------
 
-Building c(ASP) requires CIAO Prolog to be installed on the local
-machine. The system has been tested using CIAO Prolog on a Mac.
-
-The following command can be executed from a command prompt in the
-'src/' directory:
-
-       ciao -x -o casp main.pl
-
-Compilation will produce the executable 'casp', which can then be
-moved as necessary.
-
+See src/README for the installation instructions of c(ASP) and its HTML
+local_interface.
 
 5. Usage
 --------
