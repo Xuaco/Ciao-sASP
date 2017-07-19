@@ -332,7 +332,6 @@ solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, -(Gj, Cj, [J]), NMR) :-
                 print_var_constraints(C2),
                 write(')'), nl
                 )),
-        Cflag >= 0, % If we have coinductive failure, we can fail and backtrack immediately
         if_debug(5, (
                 (Cflag =:= 1 ->
                         G3 =.. [Fn | A],
@@ -367,16 +366,15 @@ solve_predicate(G, Vi, Vo, CHSi, CHSo, Cs, E, -(Gj, Cj, [J]), NMR) :-
                 print_var_constraints(C2),
                 write(')'), nl
                 )),
-        Cflag >= 0, % If we have coinductive failure, we can fail and backtrack immediately
         expand_call(Cflag, G, V1, Vo, CHSi, CHSo, Cs, El, E, J, NMR).
 
 %! expand_call(+CHSflag:int, +Goal:compound, +VarsIn:compound, -VarsOut:compound, +CHSin:list, -CHSout:list, +CallStack:list, +EvenLoopIn:compound, -EvenLoopOut:list, -Justification:compound, +InNMR:int)
 % Solve a single goal that we know is a predicate. Check the CHS first, then
 % act based on the result.
 %
-% @param CHSflag Result of checking the CHS for the call. 0, 1 or 2, indicating
-%        not present, coinductive success, or check intervening negations,
-%        respectively.
+% @param CHSflag Result of checking the CHS for the call. -1, 0, 1 or 2,
+% indicating possible positive loop, not present, coinductive success, or check
+% intervening negations, respectively.
 % @param Goal The goal being solved.
 % @param VarsIn Input variables.
 % @param VarsOut Output variables.
@@ -402,7 +400,7 @@ expand_call(1, G, Vi, Vo, CHS, CHS, _, Ei, Eo, -(chs__success, G2, C), _) :- % c
         ),
         format_term(G, G2, C, Vi), % fill in variables, strip prefixes, etc.
         !.
-expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
+expand_call(Cflag, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
         predicate(G, F, A),
         format_term(G, G2, C, Vi),
         if_debug(4, (
@@ -419,14 +417,20 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
                 write(')'), nl
                 )),
         once(findall(R, (defined_rule(F, H, B), rule(R, H, B)), Rs)), % get potentially matching clauses
+        (Cflag =:= -1 ->
+                fail, % !!! REMOVE ONCE CALL BELOW COMPLETE !!!
+                strip_used_rules(Cs, Rs, Rs2, G, V1)
+        ;
+                Rs2 = Rs
+        ),
         if_debug(4, (
                 format_term(G, G4, C3, V1),
-                format_term_list(Rs, Rs2, _, V1),
-                writef('EC: expanding ~w (', [G4]),
+                format_term_list(Rs2, Rs3, _, V1),
+                writef('EC: expanding %w (', [G4]),
                 print_var_constraints(C3),
                 writef(') with rules ~w\n', [Rs2])
                 )),
-        expand_call2(G, Rs, V1, V2, CHS1, CHS2, [G | Cs], E1, J, NMR), % expand
+        expand_call2(G, Rs2, V1, V2, CHS1, CHS2, [-(G, R) | Cs], E1, J, NMR), % expand
         remove_from_chs(E, CHS2, CHS3), % remove original goal from CHS
         get_sub_vars(E1, Ev, V2, V3),
         once(add_to_chs(F, A, 1, NMR, _, Ev, V3, Vo, CHS3, CHSo)), % add succeeding goal to CHS
@@ -456,7 +460,7 @@ expand_call(0, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
 %        list contains info on the rules used to satisfy Goal.
 % @param InNMR 1 if the goal was first added after entering the NMR check, 0
 %        otherwise.
-expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(Head-Body), C, Js), NMR) :- % match
+expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(G2), C, Js), NMR) :- % match
         rule(X, H, B),
         once(get_unique_vars(H, H2, B, B2, Vi, V1)),
         if_debug(3, (
@@ -486,6 +490,35 @@ expand_call2(G, [_ | T], Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :- % not a match or 
                 )),
         !,
         expand_call2(G, T, Vi, Vo, CHSi, CHSo, Cs, E, J, NMR).
+
+%! strip_used_rules(+CallStack:list, +RulesIn:list, -RulesOut:list, +Goal:compound, +Vars:compound) is det
+% When encountering a potential positive loop, instead of failing, we want to
+% force it to execute *while skipping rules that have already been tried*. To
+% do this, check matching call stack entries and remove their rules from the
+% list of rules produced by expand_call/11. The process is very similar to
+% chs:check_negations/8.
+%
+% @param CallStack The list of ancestor calls. Used to ensure that positive
+%        loops fail.
+% @param RulesIn Input rule list.
+% @param RulesOut Output rule list.
+% @param Goal The goal to process.
+% @param Vars The var struct to use.
+strip_used_rules([-(X, R) | T], Rsi, Rso, G, V) :-
+        % recreate positive loop check from chs:check_negations/8
+        predicate(G, F, A1),
+        predicate(X, F, A2),
+        solve_unify(G, X, V, V2, 1),
+        chs_entry(E1, F, A1, _, _),
+        chs_entry(E2, F, A2, _, _),
+        % !!!STOPPED HERE!!!
+        !,
+        strip_used_rules(T, Rsi, Rso, G, V).
+strip_used_rules([_ | T], Rsi, Rso, G, V) :- % current entry isn't an exact match
+        !,
+        strip_used_rules(T, Rsi, Rso, G, V).
+strip_used_rules([], Rs, Rs, _, _) :-
+        !.
 
 %! gen_sub_vars(+LoopVars:list, -SubVars:list, +VarsIn:compound, -VarsOut:compound)
 % For each loop variable, create a unique variable to substitute in the CHS.

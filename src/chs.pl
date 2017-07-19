@@ -92,7 +92,7 @@ new_chs(CHS) :-
 % @param Code Return value. -1, 0, 1. See above.
 % @param EvenLoop Struct containing goals and vars for an even loop, if one is
 %        found.
-check_chs(F, A, V, V, C, _, -1, -([], [])) :- % coinductive failure
+check_chs(F, A, V, V, C, _, _, _) :- % coinductive failure
         negate_functor(F, Fn),
         chs_entry(E, Fn, A, _, _),
         once(rb_lookup(Fn, Esn, C)),
@@ -129,8 +129,7 @@ check_chs(F, A, Vi, Vo, C, Cs, Flag, Eloop) :- % constructive coinductive failur
                 %writef('chs got negation ~w for ~w\n', [G3, F]),
                 true
         ), % if we run out of values, fail without backtracking
-        once(check_chs2(F, A2, V2, Vo, C, Cs, Flag, Eloop)), % test new values
-        Flag >= 0.
+        once(check_chs2(F, A2, V2, Vo, C, Cs, Flag, Eloop)). % test new values
 check_chs(F, A, Vi, Vo, C, Cs, Flag, Eloop) :- % coinductive success; success flag set
         check_chs2(F, A, Vi, Vo, C, Cs, Flag, Eloop).
         %force(write('cchsc\n')).
@@ -509,7 +508,7 @@ exact_match2([], [], _) :-
 %        call stack, if one exists.
 % @param CVars List of value IDs for non-ground variables present in both the
 %        ancestor and recursive call, by value ID.
-check_negations(G, [X | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
+check_negations(G, [-(X, _) | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
         predicate(X, F2, _),
         is_dual(F2),
         predicate(G, F, _),
@@ -517,14 +516,14 @@ check_negations(G, [X | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
         F \= F2, % not a match
         !,
         check_negations(G, T, Vi, Vo, 1, R, C, Cv).
-check_negations(G, [X | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
+check_negations(G, [-(X, _) | T], Vi, Vo, _, R, [X | C], Cv) :- % Intervening negation
         predicate(X, F, _),
         is_dual(F),
         %writef('cn b: ~w vs ~w\n', [G, X]),
         \+solve_unify(G, X, Vi, _, 1), % not a match
         !,
         check_negations(G, T, Vi, Vo, 1, R, C, Cv).
-check_negations(G, [X | T], Vi, Vo, N, R, C, Cv) :- % Match found
+check_negations(G, [-(X, _) | T], Vi, Vo, N, R, C, Cv) :- % Match found
         predicate(G, F, A1),
         predicate(X, F, A2),
         %writef('cn c: ~w vs ~w\nVi = ~w', [G, X,Vi]),
@@ -553,7 +552,7 @@ check_negations(G, [X | T], Vi, Vo, N, R, C, Cv) :- % Match found
                 )
         ),
         !.
-check_negations(G, [X | T], Vi, Vo, N, R, [X | C], Cv) :- % Neither a match nor a negation; keep going
+check_negations(G, [-(X, _) | T], Vi, Vo, N, R, [X | C], Cv) :- % Neither a match nor a negation; keep going
         !,
         check_negations(G, T, Vi, Vo, N, R, C, Cv).
 

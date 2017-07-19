@@ -1,0 +1,128 @@
+TEST test1: % { p, r, not q }, { p, not q }, { q, not p, not r }
+{ p, r, not q }
+
+{ p, not q }
+
+{ q, not p, not r }
+
+
+TEST test2: % { not p, not q, not r }
+{ comp, not p, not q, not r }
+
+
+TEST test3: % false.
+false.
+
+
+TEST test4: % { p, not q }
+{ p, not q }
+
+
+TEST test5: % { q, r, not p }
+{ q, r, not p }
+
+
+TEST test6: % answer set: { not p, not q }
+{ not p, not q }
+
+
+TEST test7: % { q, r, not p, not s }
+{ q, r, not p, not s }
+
+
+TEST test8: % { q, s, not p, not r }
+{ comp, q, s, not p, not r }
+
+
+TEST test9: % false.
+false.
+
+
+TEST test10: % { p, q, r, not s }
+{ p, q, r, not s }
+
+
+TEST test11: % { p, r, not q }, { p, q, not r }
+{ p, r, not q }
+
+{ p, q, not r }
+
+
+TEST test12: % { p, r, not q, not s }
+{ p, r, not q, not s }
+
+
+TEST test13: % { p, q, r, not s, not t }
+{ p, q, r, not s, not t }
+
+
+TEST test14: % { t, not p, not q, not r, not s, not u }
+{ t, not p, not q, not r, not s, not u }
+
+
+TEST test15: % false.
+false.
+
+
+TEST test16: % { a, b, c, not d, not e }, { a, c, d, not b, not e }
+{ a, b, c, not d, not e }
+
+{ a, c, d, not b, not e }
+
+
+TEST test17: % { p, not q }
+{ p, not q }
+
+
+TEST test18: % { bird(tweety), flies(tweety), not -flies(tweety) }, { -flies(tweety), bird(tweety), not flies(tweety) }
+{ bird(tweety), flies(tweety), not -flies(Var8) ( Var8 \= tweety ), not -flies(tweety) }
+
+{ -flies(tweety), bird(tweety), not -flies(Var8) ( Var8 \= tweety ), not flies(tweety) }
+
+
+TEST test19: % false.
+false.
+
+
+TEST test20: % false.
+false.
+
+
+TEST test21: % { p(2), ... not p(Var20) ( Var20 \= 1, Var20 \= 2 ), not p(Var40) ( Var40 \= 2 ), not q(2) }
+{ p(2), q(Var18) ( Var18 \= 1, Var18 \= 2 ), q(Var38) ( Var38 \= 2 ), not p(Var20) ( Var20 \= 1, Var20 \= 2 ), not p(Var40) ( Var40 \= 2 ), not q(2) }
+
+
+TEST family: % { ancestor(bob,sam), ancestor(jill,sam), ... }
+{ ancestor(bob,sam), ancestor(jill,sam), father(bob,jill), mother(jill,sam), parent(bob,jill), parent(jill,sam), test(Var19), test2(Var41,Var42) ( Var42 \= 1 ), test2(Var50,1), not test3(Var40) }
+
+
+TEST directive_test: % { p(_), not q(_) }
+{ p(?Var6), not q(?Var6) }
+
+
+TEST multitest: % { ancestor(bob,sam,[bob,jill,sam]), ... } x2
+{ ancestor(bob,sam,[bob,jill,sam]), ancestor(jill,sam,[jill,sam]), arith(4.59479341998814), father(bob,jill), mother(jill,sam), parent(bob,jill), parent(jill,sam), test(Var25), test([]), test2(Var47,Var48) ( Var48 \= 1 ), test2(Var56,1), not test3(Var46) }
+Z = 4.59479341998814,
+X = [bob,jill,sam]
+
+{ ancestor(bob,sam,[bob,jill,sam]), ancestor(jill,sam,[jill,sam]), arith(4.59479341998814), father(bob,jill), mother(jill,sam), parent(bob,jill), parent(jill,sam), test(Var24), test2(Var46,Var47) ( Var47 \= 1 ), test2(Var55,1), not test3(Var45) }
+Z = 4.59479341998814,
+X = [bob,jill,sam]
+
+
+TEST abdbirds: % Birds with abducibles. If we observe that a bird is abnormal, we can use our
+{ ab(tweety), bird(tweety), penguin(tweety), not flies(tweety) }
+
+{ ab(tweety), bird(tweety), wounded_bird(tweety), not flies(tweety) }
+
+{ ab(tweety), bird(tweety), not flies(tweety) }
+
+
+TEST queens: % 4-queens: ((1,2),(2,4),(3,1),(4,3)) and ((1,3),(2,1),(3,4),(4,2))
+{ nqueens(4,[q(1,2),q(2,4),q(3,1),q(4,3)]), q(1,2), q(2,4), q(3,1), q(4,3) }
+Q = [q(1,2),q(2,4),q(3,1),q(4,3)]
+
+{ nqueens(4,[q(1,3),q(2,1),q(3,4),q(4,2)]), q(1,3), q(2,1), q(3,4), q(4,2) }
+Q = [q(1,3),q(2,1),q(3,4),q(4,2)]
+
+
