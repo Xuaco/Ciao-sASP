@@ -430,7 +430,7 @@ expand_call(Cflag, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
                 print_var_constraints(C3),
                 writef(') with rules ~w\n', [Rs2])
                 )),
-        expand_call2(G, Rs2, V1, V2, CHS1, CHS2, [-(G, R) | Cs], E1, J, NMR), % expand
+        expand_call2(G, Rs2, V1, V2, CHS1, CHS2, Cs, E1, J, NMR), % expand
         remove_from_chs(E, CHS2, CHS3), % remove original goal from CHS
         get_sub_vars(E1, Ev, V2, V3),
         once(add_to_chs(F, A, 1, NMR, _, Ev, V3, Vo, CHS3, CHSo)), % add succeeding goal to CHS
@@ -479,7 +479,7 @@ expand_call2(G, [X | _], Vi, Vo, CHSi, CHSo, Cs, E, -(expand__call(G2), C, Js), 
 	;
 	    format_term(G, G2, C, V2) % fill in variables, strip prefixes, etc.
 	),
-        solve_goals(B2, V2, Vo, CHSi, CHSo, Cs, E, Js, NMR).
+        solve_goals(B2, V2, Vo, CHSi, CHSo, [-(G, X) | Cs], E, Js, NMR).
 expand_call2(G, [_ | T], Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :- % not a match or backtracking
         if_debug(2, (
                 format_term(G, G2, C, Vi),
