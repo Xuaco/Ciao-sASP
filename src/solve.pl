@@ -418,17 +418,18 @@ expand_call(Cflag, G, Vi, Vo, CHSi, CHSo, Cs, _, Eo, J, NMR) :- % not present
                 )),
         once(findall(R, (defined_rule(F, H, B), rule(R, H, B)), Rs)), % get potentially matching clauses
         (Cflag =:= -1 ->
-                fail, % !!! REMOVE ONCE CALL BELOW COMPLETE !!!
-                strip_used_rules(Cs, Rs, Rs2, G, V1)
+	      display(strip_used_rules(Cs,'\n', Rs,'\n', Rs2,'\n', G,'\n', V1)),nl,
+	      fail % !!! REMOVE ONCE CALL BELOW COMPLETE !!!
+	%%	      strip_used_rules(Cs, Rs, Rs2, G, V1),
         ;
                 Rs2 = Rs
         ),
         if_debug(4, (
                 format_term(G, G4, C3, V1),
                 format_term_list(Rs2, Rs3, _, V1),
-                writef('EC: expanding %w (', [G4]),
+                writef('EC: expanding ~w (', [G4]),
                 print_var_constraints(C3),
-                writef(') with rules ~w\n', [Rs2])
+                writef(') with rules ~w\n', [Rs3])
                 )),
         expand_call2(G, Rs2, V1, V2, CHS1, CHS2, Cs, E1, J, NMR), % expand
         remove_from_chs(E, CHS2, CHS3), % remove original goal from CHS
@@ -504,21 +505,22 @@ expand_call2(G, [_ | T], Vi, Vo, CHSi, CHSo, Cs, E, J, NMR) :- % not a match or 
 % @param RulesOut Output rule list.
 % @param Goal The goal to process.
 % @param Vars The var struct to use.
-strip_used_rules([-(X, R) | T], Rsi, Rso, G, V) :-
-        % recreate positive loop check from chs:check_negations/8
-        predicate(G, F, A1),
-        predicate(X, F, A2),
-        solve_unify(G, X, V, V2, 1),
-        chs_entry(E1, F, A1, _, _),
-        chs_entry(E2, F, A2, _, _),
-        % !!!STOPPED HERE!!!
-        !,
-        strip_used_rules(T, Rsi, Rso, G, V).
-strip_used_rules([_ | T], Rsi, Rso, G, V) :- % current entry isn't an exact match
-        !,
-        strip_used_rules(T, Rsi, Rso, G, V).
-strip_used_rules([], Rs, Rs, _, _) :-
-        !.
+% strip_used_rules([-(X, R) | T], Rsi, Rso, G, V) :-
+%         % recreate positive loop check from chs:check_negations/8
+%         predicate(G, F, A1),
+%         predicate(X, F, A2),
+%         solve_unify(G, X, V, V2, 1),
+% 	nl,display(rule(R,'\n',Rsi)),nl,
+%         chs_entry(E1, F, A1, _, _),
+%         chs_entry(E2, F, A2, _, _),
+%         % !!!STOPPED HERE!!!
+%         !,
+%         strip_used_rules(T, Rsi, Rso, G, V).
+% strip_used_rules([_ | T], Rsi, Rso, G, V) :- % current entry isn't an exact match
+%         !,
+%         strip_used_rules(T, Rsi, Rso, G, V).
+% strip_used_rules([], Rs, Rs, _, _) :-
+%         !.
 
 %! gen_sub_vars(+LoopVars:list, -SubVars:list, +VarsIn:compound, -VarsOut:compound)
 % For each loop variable, create a unique variable to substitute in the CHS.

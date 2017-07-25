@@ -96,6 +96,8 @@ The available options are:
     -vv, --veryverbose Enable very verbose progress messages.
     -j                 Print proof tree for each solution.
     -w                 Generate html file with proof tree for each solution.
+    -g                 Generate the program a transformation (+ duals and nmr_check)
+    		       formated with pr_rule/2 in a new file named <NAME_pr.pl>.
     -n                 Hide goals added to solution by global consistency checks.
     -la                Print a separate list of succeeding abducibles with each
                        CHS. List will only be printed if at least one abducible

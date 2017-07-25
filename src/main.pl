@@ -54,6 +54,7 @@ results.
 :- use_module(options).
 :- use_module(program). % for destroy_program/0
 :- use_module(solve).
+:- use_module(output).
 
 %! main
 % Used by compiled executable. Not for interactive runs.
@@ -114,7 +115,12 @@ main2(Sources) :-
         once(generate_nmr_check),
         write_verbose(0, 'Preparation of input program complete.\n'),
         user_option(mode, Mode),
-        once(solve(Mode)),
+	(
+	    user_option(generate_pr_rules, true) ->
+	    generate_pr_rules(Sources)
+	;
+	    once(solve(Mode))
+	),
         destroy_program,
         option_cleanup.
 
@@ -194,6 +200,11 @@ parse_args2([X | T], S) :-
         X = '-w',
         !,
         set_user_option(html_justification, true),
+        parse_args2(T, S).
+parse_args2([X | T], S) :-
+        X = '-g',
+        !,
+        set_user_option(generate_pr_rules, true),
         parse_args2(T, S).
 parse_args2([X | T], S) :-
         X = '-n',

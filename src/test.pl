@@ -16,12 +16,12 @@
 %% PROGRAM 1b:
 %% Previous program with predicate ASP.
 
-p(X) :- not q(X).
-q(X) :- not p(X).
+% p(X) :- not q(X).
+% q(X) :- not p(X).
 
 
-?- q(X).
-?- p(X).
+% ?- q(X).
+% ?- p(X).
 
 %% PROGRAM 2:
 %% three models (normal prolog query)
@@ -76,3 +76,24 @@ q(X) :- not p(X).
 % edgeh(1,3).
 
 % ?- reachable(0).
+
+
+
+%% PROGRAM 4:
+%% Path distance problem with positive loops
+
+path(X,Y,D) :-
+	p(X,Z,D1),
+	p(Z,Y,D2),
+	D is D1 + D2.
+
+path(X,Y,D) :-
+	edge(X,Y,D).
+
+p(A,B,C) :- path(A,B,C).
+
+edge(a,b,5).
+edge(b,c,3).
+
+?- path(X,Y,D).
+

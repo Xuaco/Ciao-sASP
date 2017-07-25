@@ -70,6 +70,8 @@ help :-
         write(user_error, '  -vv, --veryverbose Enable very verbose progress messages.\n'),
         write(user_error, '  -j                 Print proof tree for each solution.\n'),
         write(user_error, '  -w                 Generate html file with proof tree for each solution.\n'),
+        write(user_error, '  -g                 Generate the program transformation (+ duals and nmr_check)\n'),
+	write(user_error, '                     formated with pr_rule/2 in a new file named <NAME_pr.pl>.\n'),
         write(user_error, '  -n                 Hide goals added to solution by global consistency checks.\n'),
         write(user_error, '  -la                Print a separate list of succeeding abducibles with each\n'),
         write(user_error, '                     CHS. List will only be printed if at least one abducible\n'),

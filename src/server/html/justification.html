@@ -13,39 +13,42 @@
  <body style="font-size:15px;background: #ECECEC; margin:80px; color:#333;">
  
 <h3>Query</h3>
-<b><font color=blue>?-</font> p(X), &nbsp; &nbsp;r(Y).</b>
+<b><font color=blue>?-</font> flies(X).</b>
 <br><br>
-{ p(3), q(?_V<sub>15&nbsp;</sub>) ( ?_V<sub>15&nbsp;</sub> \= 3, ?_V<sub>15&nbsp;</sub> \= 4 ), r(Y<sub>16&nbsp;</sub>) ( Y<sub>16&nbsp;</sub> \= 3, Y<sub>16&nbsp;</sub> \= 4 ), not p(?_V<sub>15&nbsp;</sub>) ( ?_V<sub>15&nbsp;</sub> \= 3, ?_V<sub>15&nbsp;</sub> \= 4 ), not q(3) }
+{ bird(tweety), flies(tweety), not ab(tweety), not penguin(tweety), not wounded_bird(tweety) }
 <br><br>
 <font color=blue>
-Y \= 3, Y \= 4 ? </font>
+X = tweety ? </font>
 <br><br>
 <h3> Justification </h3>
  <ul class="tree">
-  <li> p(X) 	<font color=green size=-1> &emsp;  p(X<sub>1&nbsp;</sub>) :- not(q(X<sub>1&nbsp;</sub>)).</font>
+  <li> flies(X) 	<font color=green size=-1> &emsp;  flies(X<sub>1&nbsp;</sub>) :- bird(X<sub>1&nbsp;</sub>), &nbsp; &nbsp;not(ab(X<sub>1&nbsp;</sub>)).</font>
     <ul> 
-      <li> not(q(X<sub>1&nbsp;</sub>)) 	<font color=green size=-1> &emsp;  not(q(_V<sub>3&nbsp;</sub>)) :- not(_q1(_V<sub>3&nbsp;</sub>)).</font>
+      <li> bird(X<sub>1&nbsp;</sub>) 	<font color=green size=-1> &emsp;  bird(tweety) :- true.</font></li>
+      <li> not(ab(tweety)) 	<font color=green size=-1> &emsp;  not(ab(_V<sub>3&nbsp;</sub>)) :- not(o_ab1(_V<sub>3&nbsp;</sub>)), &nbsp; &nbsp;not(o_ab2(_V<sub>3&nbsp;</sub>)).</font>
         <ul> 
-          <li> not(_q1(_V<sub>3&nbsp;</sub>)) 	<font color=green size=-1> &emsp;  not(_q1(X<sub>5&nbsp;</sub>)) :- p(X<sub>5&nbsp;</sub>).</font>
+          <li> not(o_ab1(tweety)) 	<font color=green size=-1> &emsp;  not(o_ab1(X<sub>4&nbsp;</sub>)) :- not(penguin(X<sub>4&nbsp;</sub>)).</font>
             <ul> 
-              <li> p(X<sub>5&nbsp;</sub>) <font color=green> &emsp; &#10003; </font>  </li>
+              <li> not(penguin(tweety)) 	<font color=green size=-1> &emsp;  not(penguin(_V<sub>5&nbsp;</sub>)) :- not(o_penguin1(_V<sub>5&nbsp;</sub>)).</font>
+                <ul> 
+                  <li> not(o_penguin1(tweety)) 	<font color=green size=-1> &emsp;  not(o_penguin1(_V<sub>6&nbsp;</sub>)) :- _V<sub>6&nbsp;</sub>\=sam.</font>
+                    <ul> 
+                      <li> tweety\=sam</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li> r(Y) 	<font color=green size=-1> &emsp;  r(X<sub>8&nbsp;</sub>) :- X<sub>8&nbsp;</sub>\=3, &nbsp; &nbsp;X<sub>8&nbsp;</sub>\=4, &nbsp; &nbsp;q(X<sub>8&nbsp;</sub>).</font>
-    <ul> 
-      <li> X<sub>8&nbsp;</sub>\=3</li>
-      <li> X<sub>8&nbsp;</sub>\=4, ( [X<sub>8&nbsp;</sub>-[3]] )</li>
-      <li> q(X<sub>8&nbsp;</sub>), ( [X<sub>8&nbsp;</sub>-[3,4]] ) 	<font color=green size=-1> &emsp;  q(X<sub>10&nbsp;</sub>) :- not(p(X<sub>10&nbsp;</sub>)).</font>
-        <ul> 
-          <li> not(p(X<sub>10&nbsp;</sub>)), ( [X<sub>10&nbsp;</sub>-[3,4]] ) 	<font color=green size=-1> &emsp;  not(p(_V<sub>12&nbsp;</sub>)) :- not(_p1(_V<sub>12&nbsp;</sub>)).</font>
+          <li> not(o_ab2(tweety)) 	<font color=green size=-1> &emsp;  not(o_ab2(X<sub>7&nbsp;</sub>)) :- not(wounded_bird(X<sub>7&nbsp;</sub>)).</font>
             <ul> 
-              <li> not(_p1(_V<sub>12&nbsp;</sub>)), ( [_V<sub>12&nbsp;</sub>-[3,4]] ) 	<font color=green size=-1> &emsp;  not(_p1(X<sub>14&nbsp;</sub>)) :- q(X<sub>14&nbsp;</sub>).</font>
+              <li> not(wounded_bird(tweety)) 	<font color=green size=-1> &emsp;  not(wounded_bird(_V<sub>8&nbsp;</sub>)) :- not(o_wounded_bird1(_V<sub>8&nbsp;</sub>)).</font>
                 <ul> 
-                  <li> q(X<sub>14&nbsp;</sub>), ( [X<sub>14&nbsp;</sub>-[3,4]] ) <font color=green> &emsp; &#10003; </font>  , ( [X<sub>14&nbsp;</sub>-[3,4]] )</li>
+                  <li> not(o_wounded_bird1(tweety)) 	<font color=green size=-1> &emsp;  not(o_wounded_bird1(_V<sub>9&nbsp;</sub>)) :- _V<sub>9&nbsp;</sub>\=john.</font>
+                    <ul> 
+                      <li> tweety\=john</li>
+                    </ul>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -54,7 +57,7 @@ Y \= 3, Y \= 4 ? </font>
       </li>
     </ul>
   </li>
-  <li> _nmr_check 	<font color=green size=-1> &emsp;  _nmr_check :- true.</font></li>
+  <li> o_nmr_check 	<font color=green size=-1> &emsp;  o_nmr_check :- true.</font></li>
 </ul>
 
  <script src="js/jquery-1.11.2.js"></script>

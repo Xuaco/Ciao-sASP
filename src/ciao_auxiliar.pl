@@ -1,5 +1,6 @@
 :- module(ciao_auxiliar, [
 	absolute_file_name/3,
+	get_dir_name_ext/4,
 	get_single_char/1,
 	
 	writef/1,
@@ -22,24 +23,42 @@
 
 
 absolute_file_name(File, Abs, [relative_to(Rel)]) :-
-	atom_codes(Rel,CRel),
-	take_dir(CRel, DRel, _),
-	atom_codes(File, CFile),
-	append(DRel, CFile, CFFile),
-	atom_codes(FFile, CFFile),
+	get_dir_name_ext(Rel, Dir, _, _),
+	atom_concat(Dir, File, FFile),
 	absolute_file_name(FFile, Abs).
 
-take_dir(File, Dir, Name) :-
-	reverse(File, RF),
-	take_dir_(RF,RN,RD),
-	reverse(RN, Name),
-	reverse(RD, Dir).
+get_dir_name_ext(File, Dir, Name, Ext) :-
+	atom_codes(File,CFile),
+	reverse(CFile, RF),
+	get_dir_name_ext_(RF,RD,RN,RE),
+	(
+	    RN == [] ->
+	    Ext = '',
+	    reverse(RE,CName), atom_codes(Name, CName)
+	;
+	    reverse(RE, CExt), atom_codes(Ext, CExt),
+	    reverse(RN, CName), atom_codes(Name, CName)
+	),
+	reverse(RD, CDir), atom_codes(Dir, CDir).
 
-take_dir_([],[],[]).
-take_dir_([X|Xs],[X|N],Dir) :-
+get_dir_name_ext_([X|Xs], Dir, Name, [X|Es]) :-
 	X \== 47,
-	take_dir_(Xs, N, Dir).
-take_dir_([X|Xs],[],[X|Xs]) :-
+	X \== 46,
+	get_dir_name_ext_(Xs, Dir, Name, Es).
+get_dir_name_ext_([X|Rest],Dir,Name,[46]) :-
+	X \== 47,
+	X == 46,
+	get_dir_name_ext__(Rest,Dir,Name).
+get_dir_name_ext_([X|Rest],[X|Rest],[],[]) :-
+	X == 47.
+get_dir_name_ext_([],[],[],[]).
+
+
+get_dir_name_ext__([],[],[]).
+get_dir_name_ext__([X|Xs],Dir,[X|N]) :-
+	X \== 47,
+	get_dir_name_ext__(Xs, Dir, N).
+get_dir_name_ext__([X|Xs],[X|Xs],[]) :-
 	X == 47.
 
 

@@ -9,6 +9,7 @@
                         indent/1,
                         print_justification/1,
                         print_html/2,
+			generate_pr_rules/1,
                         print_abducibles/2
                      ]).
 
@@ -395,7 +396,11 @@ get_next_printable([X | T], CHS) :-
                 X3 \= not(_),
                 X4 = X3
         ),
-        atom_chars(X4, ['_' | _]), % non-printing literal; skip it.
+	(
+	    atom_chars(X4, ['o', '_' | _])
+	;
+	    atom_chars(X4, ['_' | _])   % non-printing literal; skip it.
+	),
         !,
         get_next_printable(T, CHS).
 get_next_printable([X | T], [X | T2]) :-
@@ -452,6 +457,10 @@ strip_prefixes(Fi, Fo) :-
         has_prefix(Fi, 'd'), % dummy prefix, remove and finish
         atom_chars(Fi, ['d', '_' | Fc]),
         atom_chars(Fo, Fc),
+        !.
+strip_prefixes(Fi, Fo) :- % '_' prefixes change to 'o_'
+	atom_chars(Fi, ['_' | Fc]),
+	atom_chars(Fo, ['o', '_' | Fc]),
         !.
 strip_prefixes(F, F) :- % no prefixes
         !.
@@ -999,7 +1008,8 @@ print_abducibles3([], _, _) :-
 % @param Justification A list of structs of the form -(Goal, Constraints, SubList).
 print_html(X,[Q,CHSo,Qv,Vo]) :-
 	writef('\n\nBEGIN HTML JUSTIFICATION'),
-	open_output_file(Stream,Temp),
+	File = 'html/justification.html',
+	open_output_file(Stream,File,Current),
 	print('<!doctype html>\n <html>\n <head>\n <meta charset="utf-8">\n <title>c(ASP) Justification</title>\n <link href="css/jquery.treemenu.css" rel="stylesheet" type="text/css">\n <link href="css/tree.css" rel="stylesheet" type="text/css">\n \n <link rel="icon" href="logo.ico">\n \n </head>\n \n <body style="font-size:15px;background: #ECECEC; margin:80px; color:#333;">\n \n'),
 	print('<h3>Query</h3>'),nl,
 	once(print_query(Q)),nl,
@@ -1027,7 +1037,7 @@ print_html(X,[Q,CHSo,Qv,Vo]) :-
 	print_list(X,2),
 	print('</ul>'),nl,nl,
 	print(' <script src="js/jquery-1.11.2.js"></script>\n <script src="js/jquery.treemenu.js"></script>\n \n <script>\n $(function(){\n        $(".tree").treemenu({delay:100}).openActive();\n    });\n </script>\n \n </body>\n </html>'),
-	close_output_file(Stream,Temp),
+	close_output_file(Stream,Current),
         write('\nEND HTML JUSTIFICATION'), 
 	!.
 
@@ -1049,15 +1059,13 @@ print_body([X,Y|Xs]):-
 	print(X),print(', &nbsp; &nbsp;'),
 	print_body([Y|Xs]).
 
-:- dynamic file/1.
-open_output_file(Stream,Temp) :-
-	current_output(Temp),
-	File = 'html/justification.html',
+open_output_file(Stream,File,Current) :-
+	current_output(Current),
 	open(File,append,_F),close(_F), %% if File does not exists open it
 	open(File,write,Stream),
 	set_output(Stream).
-close_output_file(Stream,Temp) :-
-	set_output(Temp),
+close_output_file(Stream,Current) :-
+	set_output(Current),
 	close(Stream).
 	
 br :- print('<br>').
@@ -1102,3 +1110,34 @@ print_var(B) :- !,
         ;
 	    true
         ).
+
+
+
+
+
+%! generate_pr_rules/0
+generate_pr_rules([Source|_]) :-
+	get_dir_name_ext(Source, _Dir, Name, _Ext),
+	atom_concat(Name, '_pr.pl',File),
+	format('\nBEGIN pr_rules GENERATION in file: ~w\n',File),
+ 	open_output_file(Strem,File,Current),
+	findall(R, (defined_rule(_, H, B), rule(R, H, B)), Rs),
+	new_var_struct(V),
+	format_term_list(Rs,Rs2,_,V),
+	(
+	    defined_nmr_check(NMR) ->
+	    format_term_list(NMR, NMR2, _, V)
+        ;
+	    NMR2 = []
+        ),
+	print_pr_rules(Rs2),
+	print(pr_rule('add_to_query',NMR2)),
+	print('.'),nl,
+	close_output_file(Strem, Current),
+	write('\nEND pr_rules GENERATION\n'),!.
+
+print_pr_rules([]).
+print_pr_rules([-(Head, Body)|Rs]) :-
+	print(pr_rule(Head,Body)),
+	print('.'),nl,
+	print_pr_rules(Rs).
